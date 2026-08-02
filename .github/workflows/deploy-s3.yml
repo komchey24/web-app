@@ -56,11 +56,17 @@ jobs:
             --content-type "text/html"
 
       - name: Purge Bunny CDN cache
-        if: ${{ secrets.BUNNY_PULL_ZONE_ID != '' }}
+        env:
+          BUNNY_PULL_ZONE_ID: ${{ secrets.BUNNY_PULL_ZONE_ID }}
+          BUNNY_API_KEY: ${{ secrets.BUNNY_API_KEY }}
         run: |
+          if [ -z "$BUNNY_PULL_ZONE_ID" ]; then
+            echo "BUNNY_PULL_ZONE_ID not set — skipping CDN purge"
+            exit 0
+          fi
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "https://api.bunny.net/pullzone/${{ secrets.BUNNY_PULL_ZONE_ID }}/purgeCache" \
-            -H "AccessKey: ${{ secrets.BUNNY_API_KEY }}" \
+            -X POST "https://api.bunny.net/pullzone/${BUNNY_PULL_ZONE_ID}/purgeCache" \
+            -H "AccessKey: ${BUNNY_API_KEY}" \
             -H "Content-Type: application/json")
           if [ "$HTTP_STATUS" -ne 204 ]; then
             echo "Bunny CDN purge failed with HTTP $HTTP_STATUS"
