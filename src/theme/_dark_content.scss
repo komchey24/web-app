@@ -21,7 +21,7 @@
         max-width: 20rem;
         padding: 0;
         margin: 0;
-        content: url('../assets/images/white-mifos.png');
+        content: url('../assets/images/KC24-teal-amber.png');
       }
 
       .logo-section {
@@ -279,9 +279,8 @@ body.dark-theme {
 
   // Home page logo styling for dark mode
   mifosx-home {
-    [src*='KC24-teal-amber.png'],
     [src$='_home.png'] {
-      content: url('../assets/images/white-mifos.png');
+      content: url('../assets/images/KC24-teal-amber.png');
     }
   }
 

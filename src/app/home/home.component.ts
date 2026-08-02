@@ -224,6 +224,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       return;
     }
     target.onerror = null;
-    target.src = `assets/images/default_home.png`;
+    target.src = `assets/images/KC24-teal-amber.png`;
   }
 }

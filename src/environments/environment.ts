@@ -70,8 +70,8 @@ export const environment = {
   displayTenantSelector: loadedEnv.displayTenantSelector || 'true',
   /** Production mode - when true, shows minimal hero with only branding at bottom */
   productionMode: loadedEnv.productionMode === 'true' || loadedEnv.productionMode === true || false,
-  tenantLogoUrl: loadedEnv.tenantLogoUrl || 'assets/images/default_home.png',
-  tenantLogoUrlDark: loadedEnv.tenantLogoUrlDark || 'assets/images/white-mifos.png',
+  tenantLogoUrl: loadedEnv.tenantLogoUrl || 'assets/images/KC24-teal-amber.png',
+  tenantLogoUrlDark: loadedEnv.tenantLogoUrlDark || 'assets/images/KC24-teal-amber.png',
   documentationBaseUrl: loadedEnv.documentationBaseUrl || 'https://mifosforge.jira.com/wiki',
   // Time in seconds, default 60 seconds
   waitTimeForNotifications: loadedEnv.waitTimeForNotifications || 60,
