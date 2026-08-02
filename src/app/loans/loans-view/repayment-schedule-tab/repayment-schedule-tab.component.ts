@@ -35,7 +35,7 @@ import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
 
 import { jsPDF, jsPDFOptions } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { NgClass, CurrencyPipe } from '@angular/common';
+import { NgClass, CurrencyPipe, getCurrencySymbol } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
@@ -271,6 +271,11 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
     };
     const pdf = new jsPDF(options);
 
+    // jsPDF's built-in fonts only cover Latin-1; symbols like ៛ (KHR) render as garbage,
+    // so fall back to the ISO currency code in the exported PDF.
+    const currencySymbol = getCurrencySymbol(this.currencyCode, 'narrow');
+    const symbolUnsupported = /[^\u0020-\u00ff]/.test(currencySymbol);
+
     autoTable(pdf, {
       html: '#repaymentSchedule',
       bodyStyles: { lineColor: [
@@ -282,6 +287,11 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
         fontSize: 8,
         cellWidth: 'auto',
         halign: 'center'
+      },
+      didParseCell: (data) => {
+        if (symbolUnsupported) {
+          data.cell.text = data.cell.text.map((line) => line.split(currencySymbol).join(`${this.currencyCode} `));
+        }
       }
     });
     pdf.save(fileName);
