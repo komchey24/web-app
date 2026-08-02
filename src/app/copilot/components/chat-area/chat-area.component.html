@@ -23,7 +23,7 @@
   <ng-container *ngFor="let msg of messages; trackBy: trackByMessageId">
     <div class="msg" [class.msg--user]="msg.role === 'user'" [class.msg--ai]="msg.role === 'assistant'">
       <div *ngIf="msg.role === 'assistant' && !(msg.isStreaming && !msg.content?.trim())" class="msg__avatar">
-        <img src="assets/images/MifosX_logo.png" alt="Mifos AI" />
+        <img src="assets/images/MifosX_logo.png" alt="KC24 AI" />
       </div>
       <div class="msg__content">
         <div class="msg__bubble" *ngIf="msg.content?.trim() || msg.role === 'user'">
@@ -57,7 +57,7 @@
 
   <!-- Typing indicator -->
   <div *ngIf="isStreaming" class="typing">
-    <div class="msg__avatar"><img src="assets/images/MifosX_logo.png" alt="Mifos AI" /></div>
+    <div class="msg__avatar"><img src="assets/images/MifosX_logo.png" alt="KC24 AI" /></div>
     <div class="typing__dots"><span></span><span></span><span></span></div>
   </div>
 </div>

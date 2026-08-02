@@ -1,12 +1,12 @@
 {
-  "short_name": "Mifos® X",
-  "name": "Mifos® X Web App",
+  "short_name": "KC24",
+  "name": "KC24 Web App",
   "start_url": "/",
   "scope": "/",
   "theme_color": "#fff",
   "background_color": "#fff",
   "display": "standalone",
-  "description": "Mifos® X Web App is the default web application built on top of the Apache Fineract® platform for the Mifos® user community leveraging the popular Angular framework.",
+  "description": "KC24 Web App is a web application built on top of the Apache Fineract® platform leveraging the popular Angular framework.",
   "icons": [
     {
       "src": "assets/images/MifosX_logo.png",
