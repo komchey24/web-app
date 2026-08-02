@@ -211,6 +211,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/home']);
   }
 
+  get homeImage(): string {
+    return this.tenant !== 'default' ? `assets/images/${this.tenant}_home.png` : 'assets/images/KC24-teal-amber.png';
+  }
+
   tenantIdentifier() {
     if (!this.settingsService.tenantIdentifier || this.settingsService.tenantIdentifier === '') {
       return 'default';
