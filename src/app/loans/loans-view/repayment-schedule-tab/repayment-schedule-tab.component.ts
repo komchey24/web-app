@@ -58,6 +58,14 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { ClientsService } from 'app/clients/clients.service';
+import { KhmerPrintClient, KhmerPrintLoan, openKhmerSchedulePrintView } from './khmer-schedule-print';
+
+type LoanDetailsForSchedule = KhmerPrintLoan & {
+  repaymentSchedule?: RepaymentSchedule;
+  currency?: { code: string };
+  clientId?: number;
+};
 
 @Component({
   selector: 'mifosx-repayment-schedule-tab',
@@ -94,6 +102,10 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
   private settingsService = inject(SettingsService);
   private dateUtils = inject(Dates);
   private dialog = inject(MatDialog);
+  private clientsService = inject(ClientsService);
+
+  /** Full loan details from the parent resolver, used by the Khmer print view */
+  loanDetails: LoanDetailsForSchedule | null = null;
 
   /** Currency Code */
   @Input() currencyCode: string;
@@ -161,7 +173,8 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (this.route.parent) {
       this.route.parent.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (data: { loanDetailsData: { repaymentSchedule?: RepaymentSchedule; currency?: { code: string } } }) => {
+        next: (data: { loanDetailsData: LoanDetailsForSchedule }) => {
+          this.loanDetails = data.loanDetailsData ?? null;
           this.loanDetailsDataRepaymentSchedule =
             data.loanDetailsData?.repaymentSchedule ?? this.getDefaultRepaymentSchedule();
           if (data.loanDetailsData?.currency?.code) {
@@ -295,6 +308,30 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
       }
     });
     pdf.save(fileName);
+  }
+
+  /**
+   * Opens a Khmer-language print view (client info, loan info, schedule) in a
+   * new window; the browser's print dialog handles saving as PDF. jsPDF is not
+   * used here because it cannot shape Khmer script.
+   */
+  exportToKhmerPdf(): void {
+    const schedule = this.repaymentScheduleDetails;
+    if (!schedule) {
+      return;
+    }
+    const loan = this.loanDetails ?? {};
+    const businessDate = this.settingsService.businessDate;
+    const openView = (client: KhmerPrintClient) => openKhmerSchedulePrintView(loan, schedule, client, businessDate);
+
+    if (this.loanDetails?.clientId) {
+      this.clientsService.getClientData(String(this.loanDetails.clientId)).subscribe({
+        next: (client: KhmerPrintClient) => openView(client),
+        error: () => openView({})
+      });
+    } else {
+      openView({});
+    }
   }
 
   editInstallment(period: RepaymentSchedulePeriod): void {
