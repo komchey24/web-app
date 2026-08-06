@@ -25,6 +25,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { OrganizationService } from '../../organization.service';
+import { EMPLOYEE_NAME_PATTERN } from '../employee-name.validator';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { MatDialog } from '@angular/material/dialog';
@@ -114,14 +115,14 @@ export class CreateEmployeeComponent implements OnInit, AfterViewInit {
         '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(EMPLOYEE_NAME_PATTERN)
         ]
       ],
       lastname: [
         '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(EMPLOYEE_NAME_PATTERN)
         ]
       ],
       isLoanOfficer: [false],
