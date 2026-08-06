@@ -84,7 +84,7 @@
     <div class="details-grid">
       @if (recipientData.address?.line1) {
         <div class="detail-item">
-          <span class="label">{{ 'labels.inputs.Address Line' | translate }}</span>
+          <span class="label">{{ 'labels.inputs.Address Line 1' | translate }}</span>
           <span class="value">{{ recipientData.address?.line1 }}</span>
         </div>
       }
@@ -98,7 +98,7 @@
 
       @if (recipientData.address?.state) {
         <div class="detail-item">
-          <span class="label">{{ 'labels.inputs.State' | translate }}</span>
+          <span class="label">{{ 'labels.inputs.State / Province' | translate }}</span>
           <span class="value">{{ recipientData.address?.state }}</span>
         </div>
       }
