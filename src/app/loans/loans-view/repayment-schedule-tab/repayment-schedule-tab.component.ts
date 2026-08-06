@@ -59,7 +59,14 @@ import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ClientsService } from 'app/clients/clients.service';
-import { KhmerPrintClient, KhmerPrintLoan, openKhmerSchedulePrintView } from './khmer-schedule-print';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import {
+  KhmerPrintAddress,
+  KhmerPrintClient,
+  KhmerPrintLoan,
+  openKhmerSchedulePrintView
+} from './khmer-schedule-print';
 
 type LoanDetailsForSchedule = KhmerPrintLoan & {
   repaymentSchedule?: RepaymentSchedule;
@@ -321,17 +328,21 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
       return;
     }
     const loan = this.loanDetails ?? {};
-    const businessDate = this.settingsService.businessDate;
-    const openView = (client: KhmerPrintClient) => openKhmerSchedulePrintView(loan, schedule, client, businessDate);
+    const clientId = this.loanDetails?.clientId;
 
-    if (this.loanDetails?.clientId) {
-      this.clientsService.getClientData(String(this.loanDetails.clientId)).subscribe({
-        next: (client: KhmerPrintClient) => openView(client),
-        error: () => openView({})
-      });
-    } else {
-      openView({});
+    if (!clientId) {
+      openKhmerSchedulePrintView(loan, schedule, {});
+      return;
     }
+
+    // The address module is optional in Fineract, so a failing address call must
+    // not stop the print view — it just leaves the address line blank.
+    forkJoin({
+      client: this.clientsService.getClientData(String(clientId)).pipe(catchError(() => of({}))),
+      addresses: this.clientsService.getClientAddressData(String(clientId)).pipe(catchError(() => of([])))
+    }).subscribe(({ client, addresses }: { client: KhmerPrintClient; addresses: KhmerPrintAddress[] }) => {
+      openKhmerSchedulePrintView(loan, schedule, { ...client, addresses });
+    });
   }
 
   editInstallment(period: RepaymentSchedulePeriod): void {

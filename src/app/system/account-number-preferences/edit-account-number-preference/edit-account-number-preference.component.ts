@@ -15,6 +15,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SystemService } from 'app/system/system.service';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
+/** Prefix type that requires a user supplied prefix string, see AccountNumberPrefixType.PREFIX_SHORT_NAME. */
+const PREFIX_SHORT_NAME_CODE = 'accountNumberPrefixType.prefixShortName';
+
+/** Maximum length of the prefix character column. */
+const PREFIX_CHARACTER_MAX_LENGTH = 50;
+
 /**
  * Edit Account Number Preference Component.
  */
@@ -41,6 +47,10 @@ export class EditAccountNumberPreferenceComponent implements OnInit {
   accountNumberPreferencesTemplateData: any;
   /** Prefix Type Data */
   prefixTypeData: any[];
+  /** True when the selected prefix type expects a user supplied prefix character. */
+  isPrefixCharacterRequired = false;
+  /** Maximum length of the prefix character. */
+  prefixCharacterMaxLength = PREFIX_CHARACTER_MAX_LENGTH;
 
   /**
    * Retrieves the account number preference and account number preferences template data from `resolve`.
@@ -64,6 +74,32 @@ export class EditAccountNumberPreferenceComponent implements OnInit {
     this.prefixTypeData =
       this.accountNumberPreferencesTemplateData.prefixTypeOptions[this.accountNumberPreferenceData.accountType.code];
     this.createAccountNumberPreferenceForm();
+    this.togglePrefixCharacter(this.accountNumberPreferenceForm.get('prefixType').value);
+    this.accountNumberPreferenceForm.get('prefixType').valueChanges.subscribe((prefixTypeId) => {
+      this.togglePrefixCharacter(prefixTypeId);
+    });
+  }
+
+  /**
+   * A prefix character is only accepted, and is mandatory, when the prefix type is a
+   * user supplied short name. This mirrors the server side validation.
+   * @param {any} prefixTypeId Selected prefix type identifier.
+   */
+  togglePrefixCharacter(prefixTypeId: any) {
+    const prefixCharacter = this.accountNumberPreferenceForm.get('prefixCharacter');
+    this.isPrefixCharacterRequired = (this.prefixTypeData || []).some(
+      (prefixType: any) => prefixType.id === prefixTypeId && prefixType.code === PREFIX_SHORT_NAME_CODE
+    );
+    if (this.isPrefixCharacterRequired) {
+      prefixCharacter.setValidators([
+        Validators.required,
+        Validators.maxLength(PREFIX_CHARACTER_MAX_LENGTH)
+      ]);
+    } else {
+      prefixCharacter.clearValidators();
+      prefixCharacter.setValue('', { emitEvent: false });
+    }
+    prefixCharacter.updateValueAndValidity({ emitEvent: false });
   }
 
   /**
@@ -75,7 +111,8 @@ export class EditAccountNumberPreferenceComponent implements OnInit {
         { value: this.accountNumberPreferenceData.accountType.id, disabled: true },
         Validators.required
       ],
-      prefixType: [this.accountNumberPreferenceData.prefixType ? this.accountNumberPreferenceData.prefixType.id : 0]
+      prefixType: [this.accountNumberPreferenceData.prefixType ? this.accountNumberPreferenceData.prefixType.id : 0],
+      prefixCharacter: [this.accountNumberPreferenceData.prefixCharacter || '']
     });
   }
 
@@ -87,6 +124,10 @@ export class EditAccountNumberPreferenceComponent implements OnInit {
     const accountNumberPreferenceValue = this.accountNumberPreferenceForm.value;
     if (accountNumberPreferenceValue.prefixType === '') {
       accountNumberPreferenceValue.prefixType = undefined;
+    }
+    if (!this.isPrefixCharacterRequired) {
+      /** Send an empty prefix character only to clear a previously stored one. */
+      accountNumberPreferenceValue.prefixCharacter = this.accountNumberPreferenceData.prefixCharacter ? '' : undefined;
     }
     this.systemService
       .updateAccountNumberPreference(this.accountNumberPreferenceData.id, accountNumberPreferenceValue)

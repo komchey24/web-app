@@ -38,6 +38,19 @@
               }
             </mat-select>
           </mat-form-field>
+
+          @if (isPrefixCharacterRequired) {
+            <mat-form-field>
+              <mat-label>{{ 'labels.inputs.Prefix Character' | translate }}</mat-label>
+              <input matInput required formControlName="prefixCharacter" [maxlength]="prefixCharacterMaxLength" />
+              @if (accountNumberPreferenceForm.controls.prefixCharacter.hasError('required')) {
+                <mat-error>
+                  {{ 'labels.inputs.Prefix Character' | translate }} {{ 'labels.commons.is' | translate }}
+                  <strong>{{ 'labels.commons.required' | translate }}</strong>
+                </mat-error>
+              }
+            </mat-form-field>
+          }
         </div>
       </mat-card-content>
 

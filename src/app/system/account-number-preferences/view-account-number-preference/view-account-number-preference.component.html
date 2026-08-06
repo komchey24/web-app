@@ -41,6 +41,18 @@
             {{ accountNumberPreferenceData.prefixType.value }}
           </div>
         }
+
+        @if (accountNumberPreferenceData.prefixCharacter) {
+          <div class="flex-50 mat-body-strong">
+            {{ 'labels.inputs.Prefix Character' | translate }}
+          </div>
+        }
+
+        @if (accountNumberPreferenceData.prefixCharacter) {
+          <div class="flex-50">
+            {{ accountNumberPreferenceData.prefixCharacter }}
+          </div>
+        }
       </div>
     </mat-card-content>
   </mat-card>
