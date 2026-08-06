@@ -16,6 +16,7 @@ import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angula
 import { UsersService } from '../users.service';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Edit User Component.
@@ -89,14 +90,14 @@ export class EditUserComponent implements OnInit {
         this.userData.firstname,
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       lastname: [
         this.userData.lastname,
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       passwordNeverExpires: [this.userData.passwordNeverExpires],

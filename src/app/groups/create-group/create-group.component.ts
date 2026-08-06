@@ -29,6 +29,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatNavList, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Create Group component.
@@ -124,7 +125,7 @@ export class CreateGroupComponent implements OnInit, AfterViewInit {
         '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       officeId: [

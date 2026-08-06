@@ -16,6 +16,7 @@ import { UsersService } from 'app/users/users.service';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { COUNTRY_CODES } from 'app/zitadel/constants/coutry-codes';
 import { ZITADEL_LANGUAGES } from 'app/zitadel/constants/languages';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 /**
  * Edit User Component.
  */
@@ -124,14 +125,14 @@ export class EditUserComponent implements OnInit {
         profile.firstName || '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       lastname: [
         profile.lastName || '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       countryCode: [

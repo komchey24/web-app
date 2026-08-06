@@ -33,6 +33,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Create Client Component
@@ -178,15 +179,15 @@ export class ClientGeneralStepComponent implements OnInit {
             'firstname',
             new FormControl('', [
               Validators.required,
-              Validators.pattern('(^[A-z]).*')
+              Validators.pattern(NAME_PATTERN)
             ])
           );
-          this.createClientForm.addControl('middlename', new FormControl('', Validators.pattern('(^[A-z]).*')));
+          this.createClientForm.addControl('middlename', new FormControl('', Validators.pattern(NAME_PATTERN)));
           this.createClientForm.addControl(
             'lastname',
             new FormControl('', [
               Validators.required,
-              Validators.pattern('(^[A-z]).*')
+              Validators.pattern(NAME_PATTERN)
             ])
           );
         } else {
@@ -197,7 +198,7 @@ export class ClientGeneralStepComponent implements OnInit {
             'fullname',
             new FormControl('', [
               Validators.required,
-              Validators.pattern('(^[A-z]).*')
+              Validators.pattern(NAME_PATTERN)
             ])
           );
           this.createClientForm.addControl(

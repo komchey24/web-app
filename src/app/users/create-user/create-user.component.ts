@@ -34,6 +34,7 @@ import { ConfigurationWizardService } from 'app/configuration-wizard/configurati
 import { ContinueSetupDialogComponent } from 'app/configuration-wizard/continue-setup-dialog/continue-setup-dialog.component';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Create user component.
@@ -119,14 +120,14 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
           '',
           [
             Validators.required,
-            Validators.pattern('(^[A-z]).*')
+            Validators.pattern(NAME_PATTERN)
           ]
         ],
         lastname: [
           '',
           [
             Validators.required,
-            Validators.pattern('(^[A-z]).*')
+            Validators.pattern(NAME_PATTERN)
           ]
         ],
         sendPasswordToEmail: [true],

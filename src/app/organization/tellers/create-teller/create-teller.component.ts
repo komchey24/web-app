@@ -19,6 +19,7 @@ import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Create teller component.
@@ -93,7 +94,7 @@ export class CreateTellerComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       description: [''],

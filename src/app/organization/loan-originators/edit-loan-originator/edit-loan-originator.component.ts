@@ -27,6 +27,7 @@ import { OrganizationService } from '../../organization.service';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { CodeValue } from 'app/shared/models/general.model';
 import { LoanOriginator } from 'app/loans/models/loan-account.model';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Create Loan Originator component.
@@ -95,7 +96,7 @@ export class EditLoanOriginatorComponent implements OnInit {
         this.loanOriginatorsData.name,
         [
           Validators.required,
-          Validators.pattern('^[A-Za-z].*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       status: [

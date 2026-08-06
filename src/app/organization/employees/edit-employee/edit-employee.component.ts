@@ -15,7 +15,7 @@ import { take } from 'rxjs';
 
 /** Custom Services */
 import { OrganizationService } from '../../organization.service';
-import { EMPLOYEE_NAME_PATTERN } from '../employee-name.validator';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 import { SettingsService } from 'app/settings/settings.service';
 import { Dates } from 'app/core/utils/dates';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -82,14 +82,14 @@ export class EditEmployeeComponent implements OnInit {
         this.employeeData.firstname,
         [
           Validators.required,
-          Validators.pattern(EMPLOYEE_NAME_PATTERN)
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       lastname: [
         this.employeeData.lastname,
         [
           Validators.required,
-          Validators.pattern(EMPLOYEE_NAME_PATTERN)
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       isLoanOfficer: [this.employeeData.isLoanOfficer],

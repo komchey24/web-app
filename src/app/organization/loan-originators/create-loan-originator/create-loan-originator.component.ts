@@ -26,6 +26,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OrganizationService } from '../../organization.service';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { CodeValue } from 'app/shared/models/general.model';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Create Loan Originator component.
@@ -90,7 +91,7 @@ export class CreateLoanOriginatorComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       status: [

@@ -28,6 +28,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MatNavList, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { NAME_PATTERN } from 'app/shared/validators/name.validator';
 
 /**
  * Create Center component.
@@ -106,7 +107,7 @@ export class CreateCenterComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.pattern('(^[A-z]).*')
+          Validators.pattern(NAME_PATTERN)
         ]
       ],
       officeId: [
