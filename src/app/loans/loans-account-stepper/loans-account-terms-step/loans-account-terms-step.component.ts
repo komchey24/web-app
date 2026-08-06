@@ -417,14 +417,12 @@ export class LoansAccountTermsStepComponent extends LoanProductBaseComponent imp
       }
 
       if (this.loansAccountTermsData) {
-        if (this.loansAccountTermsData.loanProductId) {
-          let formattedDate = null;
-          if (this.loansAccountTermsData.expectedFirstRepaymentOnDate) {
-            const repaymentDate = new Date(this.loansAccountTermsData.expectedFirstRepaymentOnDate);
-            formattedDate = this.formatDateToDDMMYYYY(repaymentDate);
-          }
+        // Only override the default when the template carries a date of its own; patching a
+        // falsy value here would blank the field on a new application.
+        if (this.loansAccountTermsData.loanProductId && this.loansAccountTermsData.expectedFirstRepaymentOnDate) {
+          const repaymentDate = new Date(this.loansAccountTermsData.expectedFirstRepaymentOnDate);
           this.loansAccountTermsForm.patchValue({
-            repaymentsStartingFromDate: this.loansAccountTermsData.expectedFirstRepaymentOnDate && formattedDate
+            repaymentsStartingFromDate: this.formatDateToDDMMYYYY(repaymentDate)
           });
         }
         if (this.isDelinquencyEnabled()) {
@@ -721,7 +719,7 @@ export class LoansAccountTermsStepComponent extends LoanProductBaseComponent imp
         ],
         repaymentFrequencyNthDayType: [''],
         repaymentFrequencyDayOfWeekType: [''],
-        repaymentsStartingFromDate: [''],
+        repaymentsStartingFromDate: [this.settingsService.businessDate],
         interestChargedFromDate: [''],
         interestRatePerPeriod: [
           '',

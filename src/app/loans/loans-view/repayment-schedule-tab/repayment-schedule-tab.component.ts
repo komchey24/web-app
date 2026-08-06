@@ -59,6 +59,7 @@ import { DateFormatPipe } from '../../../pipes/date-format.pipe';
 import { FormatNumberPipe } from '../../../pipes/format-number.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { ClientsService } from 'app/clients/clients.service';
+import { OrganizationService } from 'app/organization/organization.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {
@@ -72,6 +73,7 @@ type LoanDetailsForSchedule = KhmerPrintLoan & {
   repaymentSchedule?: RepaymentSchedule;
   currency?: { code: string };
   clientId?: number;
+  loanOfficerId?: number;
 };
 
 @Component({
@@ -110,6 +112,7 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
   private dateUtils = inject(Dates);
   private dialog = inject(MatDialog);
   private clientsService = inject(ClientsService);
+  private organizationService = inject(OrganizationService);
 
   /** Full loan details from the parent resolver, used by the Khmer print view */
   loanDetails: LoanDetailsForSchedule | null = null;
@@ -329,9 +332,18 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
     }
     const loan = this.loanDetails ?? {};
     const clientId = this.loanDetails?.clientId;
+    const loanOfficerId = this.loanDetails?.loanOfficerId;
+
+    // The loan payload carries only the officer's name, so the mobile number has
+    // to come from /staff; a failure there just leaves the phone line blank.
+    const loanOfficer$ = loanOfficerId
+      ? this.organizationService.getEmployee(String(loanOfficerId), false).pipe(catchError(() => of({})))
+      : of({});
 
     if (!clientId) {
-      openKhmerSchedulePrintView(loan, schedule, {});
+      loanOfficer$.subscribe((officer: { mobileNo?: string }) => {
+        openKhmerSchedulePrintView({ ...loan, loanOfficerMobileNo: officer?.mobileNo }, schedule, {});
+      });
       return;
     }
 
@@ -339,10 +351,24 @@ export class RepaymentScheduleTabComponent implements OnInit, OnChanges {
     // not stop the print view — it just leaves the address line blank.
     forkJoin({
       client: this.clientsService.getClientData(String(clientId)).pipe(catchError(() => of({}))),
-      addresses: this.clientsService.getClientAddressData(String(clientId)).pipe(catchError(() => of([])))
-    }).subscribe(({ client, addresses }: { client: KhmerPrintClient; addresses: KhmerPrintAddress[] }) => {
-      openKhmerSchedulePrintView(loan, schedule, { ...client, addresses });
-    });
+      addresses: this.clientsService.getClientAddressData(String(clientId)).pipe(catchError(() => of([]))),
+      loanOfficer: loanOfficer$
+    }).subscribe(
+      ({
+        client,
+        addresses,
+        loanOfficer
+      }: {
+        client: KhmerPrintClient;
+        addresses: KhmerPrintAddress[];
+        loanOfficer: { mobileNo?: string };
+      }) => {
+        openKhmerSchedulePrintView({ ...loan, loanOfficerMobileNo: loanOfficer?.mobileNo }, schedule, {
+          ...client,
+          addresses
+        });
+      }
+    );
   }
 
   editInstallment(period: RepaymentSchedulePeriod): void {

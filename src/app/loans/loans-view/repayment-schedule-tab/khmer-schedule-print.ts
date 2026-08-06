@@ -29,6 +29,7 @@ const LABELS = {
   mobileNo: 'ទូរស័ព្ទ',
   address: 'អាស័យដ្ឋាន',
   loanOfficer: 'មន្ត្រីឥណទាន',
+  loanOfficerMobileNo: 'ទូរស័ព្ទ',
   numberOfRepayments: 'ចំនួនកាលវិភាគ',
   principal: 'ចំនួនទឹកប្រាក់',
   currency: 'រូបិយប័ណ្ណ',
@@ -85,6 +86,8 @@ export interface KhmerPrintLoan {
   clientName?: string;
   loanProductName?: string;
   loanOfficerName?: string;
+  /** Resolved from the /staff endpoint — not part of the loan payload itself */
+  loanOfficerMobileNo?: string;
   loanCounter?: number;
   loanProductCounter?: number;
   principal?: number;
@@ -249,6 +252,7 @@ export function buildKhmerScheduleHtml(
       ${infoRow(LABELS.mobileNo, escapeHtml(client.mobileNo))}
       ${infoRow(LABELS.address, escapeHtml(formatAddress(client)))}
       ${infoRow(LABELS.loanOfficer, escapeHtml(loan.loanOfficerName))}
+      ${infoRow(LABELS.loanOfficerMobileNo, escapeHtml(loan.loanOfficerMobileNo))}
     </div>
     <div class="info-col info-col-right">
       ${infoRow(LABELS.numberOfRepayments, escapeHtml(loan.numberOfRepayments ?? installments.length))}
