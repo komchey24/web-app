@@ -111,6 +111,9 @@ export class LoanActionButtonResolver {
       return this.productService.getWorkingCapitalBreachTemplate();
     } else if (loanActionButton === 'Update Breach') {
       return this.productService.getWorkingCapitalBreachTemplate();
+    } else if (loanActionButton === 'Adjust Interest') {
+      // The form needs the current schedule to preview the adjustment and to derive the minimum allowed amount.
+      return this.loansService.getLoanAccountAssociationDetails(loanId);
     } else {
       return undefined;
     }

@@ -282,12 +282,28 @@ export class LoansViewComponent extends LoanProductBaseComponent implements OnIn
           taskPermissionName: 'ADJUST_REPAYMENT_SCHEDULE'
         });
       }
+
+      if (this.canAdjustInstallmentAmount()) {
+        this.buttonConfig.addOption({
+          name: 'Adjust Interest',
+          icon: 'edit',
+          taskPermissionName: 'ADJUST_INSTALLMENT_AMOUNT_LOAN'
+        });
+      }
     } else if (this.status === 'Approved') {
       this.buttonConfig.addButton({
         name: this.loanDetailsData.loanOfficerName ? 'Change Loan Officer' : 'Assign Loan Officer',
         icon: 'user-tie',
         taskPermissionName: 'UPDATELOANOFFICER_LOAN'
       });
+
+      if (this.canAdjustInstallmentAmount()) {
+        this.buttonConfig.addOption({
+          name: 'Adjust Interest',
+          icon: 'edit',
+          taskPermissionName: 'ADJUST_INSTALLMENT_AMOUNT_LOAN'
+        });
+      }
     } else if (this.status === 'Active') {
       if (this.loanProductService.isLoanProduct && this.loanDetailsData.enableBuyDownFee) {
         this.buttonConfig.addButton({
@@ -635,5 +651,29 @@ export class LoansViewComponent extends LoanProductBaseComponent implements OnIn
       return false;
     }
     return !this.loanDetailsData?.discountFee && this.loanDetailsData?.status?.active === true;
+  }
+
+  /**
+   * Mirrors the backend validator: the manual installment amount adjustment back-solves interest from the installment
+   * total, which is only well defined for a plain FLAT loan that has not been disbursed yet.
+   */
+  private canAdjustInstallmentAmount(): boolean {
+    const loan = this.loanDetailsData;
+    if (!this.loanProductService.isLoanProduct || !loan) {
+      return false;
+    }
+    if (loan.interestType?.value !== 'Flat' && !loan.isEqualAmortization) {
+      return false;
+    }
+    if (loan.loanScheduleType?.code === 'PROGRESSIVE') {
+      return false;
+    }
+    if (loan.multiDisburseLoan || loan.enableDownPayment || loan.isInterestRecalculationEnabled) {
+      return false;
+    }
+    if (loan.graceOnInterestPayment > 0 || loan.graceOnInterestCharged > 0) {
+      return false;
+    }
+    return loan.fixedEmiAmount == null;
   }
 }

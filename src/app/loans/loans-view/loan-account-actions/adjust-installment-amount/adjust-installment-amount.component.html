@@ -1,0 +1,99 @@
+<!--
+  Copyright since 2025 Mifos Initiative
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<div class="container mat-elevation-z8">
+  <mat-card>
+    <form [formGroup]="adjustInstallmentAmountForm" (ngSubmit)="submit()">
+      <mat-card-content>
+        <div class="layout-column">
+          <mifosx-input-amount
+            [currency]="currency"
+            [isRequired]="true"
+            [minVal]="minimumInstallmentAmount"
+            [inputFormControl]="adjustInstallmentAmountForm.controls.installmentAmount"
+            [inputLabel]="'Target Installment Amount'"
+          >
+          </mifosx-input-amount>
+
+          <p class="hint-text">
+            {{ 'labels.text.Adjust Installment Amount Hint' | translate }}
+          </p>
+
+          @if (previewPeriods.length) {
+            <div class="preview-scroll">
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>{{ 'labels.inputs.Due Date' | translate }}</th>
+                    <th class="numeric">{{ 'labels.inputs.Principal' | translate }}</th>
+                    <th class="numeric">{{ 'labels.inputs.Interest' | translate }}</th>
+                    <th class="numeric">{{ 'labels.inputs.Total Due' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (period of previewPeriods; track period.period) {
+                    <tr>
+                      <td>{{ period.period }}</td>
+                      <td>{{ period.dueDate | dateFormat }}</td>
+                      <td class="numeric">{{ period.principalDue | number: '1.0-2' }}</td>
+                      <td class="numeric">
+                        <span class="previous-value">{{ period.currentInterestDue | number: '1.0-2' }}</span>
+                        <span class="new-value">{{ period.newInterestDue | number: '1.0-2' }}</span>
+                      </td>
+                      <td class="numeric">
+                        <span class="previous-value">{{ period.currentTotalDue | number: '1.0-2' }}</span>
+                        <span class="new-value">{{ period.newTotalDue | number: '1.0-2' }}</span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3">{{ 'labels.inputs.Total Interest' | translate }}</td>
+                    <td class="numeric" colspan="2">
+                      <span class="previous-value">{{ currentTotalInterest | number: '1.0-2' }}</span>
+                      <span class="new-value">{{ newTotalInterest | number: '1.0-2' }}</span>
+                      <span class="delta" [class.negative]="interestDelta < 0">
+                        {{ interestDelta > 0 ? '+' : '' }}{{ interestDelta | number: '1.0-2' }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="3">{{ 'labels.inputs.Total Repayment' | translate }}</td>
+                    <td class="numeric" colspan="2">
+                      <span class="previous-value">{{ currentTotalRepayment | number: '1.0-2' }}</span>
+                      <span class="new-value">{{ newTotalRepayment | number: '1.0-2' }}</span>
+                      <span class="delta" [class.negative]="repaymentDelta < 0">
+                        {{ repaymentDelta > 0 ? '+' : '' }}{{ repaymentDelta | number: '1.0-2' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          }
+        </div>
+
+        <mat-card-actions class="layout-row align-center gap-5px responsive-column">
+          <button type="button" mat-raised-button (click)="gotoLoanDefaultView()">
+            {{ 'labels.buttons.Cancel' | translate }}
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="!adjustInstallmentAmountForm.valid"
+            *mifosxHasPermission="'ADJUST_INSTALLMENT_AMOUNT_LOAN'"
+          >
+            {{ 'labels.buttons.Submit' | translate }}
+          </button>
+        </mat-card-actions>
+      </mat-card-content>
+    </form>
+  </mat-card>
+</div>

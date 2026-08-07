@@ -3070,6 +3070,9 @@
       "Total Debits": "Total Debits",
       "Total Deposits": "Total Deposits",
       "Total Due": "Total Due",
+      "Total Interest": "Total Interest",
+      "Total Repayment": "Total Repayment",
+      "Target Installment Amount": "Target Installment Amount",
       "Total Interest Earned": "Total Interest Earned",
       "Total No. of Shares": "Total No. of Shares",
       "Total Number of Shares": "Total Number of Shares",
@@ -3279,6 +3282,7 @@
       "Add Charge": "Add Charge",
       "Add Collateral": "Add Collateral",
       "Add Interest Pause": "Add Interest Pause",
+      "Adjust Interest": "Adjust Interest",
       "Add Loan Charge": "Add Loan Charge",
       "Admin": "Admin",
       "All": "All",
@@ -3465,6 +3469,7 @@
       "the Transaction Type": "the Transaction Type"
     },
     "text": {
+      "Adjust Installment Amount Hint": "Sets every installment to this total (principal + interest). Interest is adjusted to absorb the difference. Fees and penalties are added on top.",
       "Max": "Max",
       "Min": "Min",
       "Any": "Any",

@@ -46,6 +46,7 @@ import { LoanProductBaseComponent } from 'app/products/loan-products/common/loan
 import { UpdateDiscountComponent } from './update-discount/update-discount.component';
 import { NearBreachConfigComponent } from '../working-capital/loan-account-actions/near-breach-config/near-breach-config.component';
 import { BreachConfigComponent } from '../working-capital/loan-account-actions/breach-config/breach-config.component';
+import { AdjustInstallmentAmountComponent } from './adjust-installment-amount/adjust-installment-amount.component';
 
 /**
  * Loan Account Actions component.
@@ -89,7 +90,8 @@ import { BreachConfigComponent } from '../working-capital/loan-account-actions/b
     AttachOriginatorComponent,
     UpdateDiscountComponent,
     NearBreachConfigComponent,
-    BreachConfigComponent
+    BreachConfigComponent,
+    AdjustInstallmentAmountComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -146,6 +148,7 @@ export class LoanAccountActionsComponent {
     'Discount Fee': boolean;
     'Update Near Breach': boolean;
     'Update Breach': boolean;
+    'Adjust Interest': boolean;
   } = {
     Close: false,
     'Undo Approval': false,
@@ -189,7 +192,8 @@ export class LoanAccountActionsComponent {
     'Attach Loan Originator': false,
     'Discount Fee': false,
     'Update Near Breach': false,
-    'Update Breach': false
+    'Update Breach': false,
+    'Adjust Interest': false
   };
 
   actionButtonData: any;
