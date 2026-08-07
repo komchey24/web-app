@@ -220,6 +220,19 @@
         </mat-form-field>
       }
 
+      @if (canAdjustInstallmentAmount()) {
+        <mat-form-field class="flex-fill flex-23">
+          <mat-label>{{ 'labels.inputs.Target Installment Amount' | translate }}</mat-label>
+          <input
+            type="number"
+            matInput
+            formControlName="installmentAmount"
+            step="any"
+            matTooltip="{{ 'labels.text.Adjust Installment Amount Hint' | translate }}"
+          />
+        </mat-form-field>
+      }
+
       <mat-form-field class="flex-fill flex-23" (click)="repaymentsPicker.open()">
         <mat-label>{{ 'labels.inputs.First repayment on' | translate }}</mat-label>
         <input

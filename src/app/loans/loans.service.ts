@@ -925,6 +925,15 @@ export class LoansService {
     if (!loansAccountData.multiDisburseLoan) {
       delete loansAccountData.disbursementData;
     }
+    // Optional target installment total. Send it only when actually filled in - the backend parses it as a decimal,
+    // so an empty string would be rejected, and a blank field must not clear a previously stored amount by accident.
+    if (
+      loansAccountData.installmentAmount === '' ||
+      loansAccountData.installmentAmount === null ||
+      loansAccountData.installmentAmount === undefined
+    ) {
+      delete loansAccountData.installmentAmount;
+    }
     delete loansAccountData.isValid;
     loansAccountData.principal = loansAccountData.principalAmount;
     delete loansAccountData.principalAmount;

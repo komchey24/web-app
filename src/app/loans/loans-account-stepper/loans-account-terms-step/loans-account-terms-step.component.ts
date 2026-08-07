@@ -244,6 +244,7 @@ export class LoansAccountTermsStepComponent extends LoanProductBaseComponent imp
           graceOnArrearsAgeing: this.loansAccountTermsData.graceOnArrearsAgeing,
           graceOnInterestCharged: this.loansAccountTermsData.graceOnInterestCharged,
           fixedEmiAmount: this.loansAccountTermsData.fixedEmiAmount,
+          installmentAmount: this.loansAccountTermsData.adjustedInstallmentAmount,
           maxOutstandingLoanBalance: this.loansAccountTermsData.maxOutstandingLoanBalance,
           transactionProcessingStrategyCode: this.loansAccountTermsData.transactionProcessingStrategyCode,
           interestRateDifferential: this.loansAccountTermsData.interestRateDifferential,
@@ -453,6 +454,7 @@ export class LoansAccountTermsStepComponent extends LoanProductBaseComponent imp
           graceOnArrearsAgeing: this.loansAccountTermsData.graceOnArrearsAgeing,
           graceOnInterestCharged: this.loansAccountTermsData.graceOnInterestCharged,
           fixedEmiAmount: this.loansAccountTermsData.fixedEmiAmount,
+          installmentAmount: this.loansAccountTermsData.adjustedInstallmentAmount,
           maxOutstandingLoanBalance: this.loansAccountTermsData.maxOutstandingLoanBalance,
           transactionProcessingStrategyCode: this.loansAccountTermsData.transactionProcessingStrategyCode,
           interestRateDifferential: this.loansAccountTermsData.interestRateDifferential,
@@ -680,6 +682,25 @@ export class LoansAccountTermsStepComponent extends LoanProductBaseComponent imp
     return this.loansAccountTermsForm.value.amortizationType === 0;
   }
 
+  /**
+   * Shows the optional target installment total (principal + interest). The schedule generator back-solves interest
+   * from it, which is only defined for FLAT loans. Kept deliberately narrow rather than mirroring every backend rule:
+   * over-gating here would just hide the field, and the backend validator rejects the remaining exotic combinations
+   * with a specific message.
+   */
+  canAdjustInstallmentAmount(): boolean {
+    if (!this.loanProductService.isLoanProduct || !this.loansAccountTermsForm) {
+      return false;
+    }
+    const flatOption = (this.interestTypeData || []).find((option: any) => option.value === 'Flat');
+    const flatId = flatOption ? flatOption.id : 1;
+    const isFlat = this.loansAccountTermsForm.value.interestType === flatId;
+    if (!isFlat && !this.loansAccountTermsData?.isEqualAmortization) {
+      return false;
+    }
+    return !this.loansAccountTermsForm.value.multiDisburseLoan;
+  }
+
   /** Create Loans Account Terms Form */
   createloansAccountTermsForm() {
     if (this.loanProductService.isLoanProduct) {
@@ -756,6 +777,7 @@ export class LoansAccountTermsStepComponent extends LoanProductBaseComponent imp
         ],
         loanIdToClose: [''],
         fixedEmiAmount: [''],
+        installmentAmount: [''],
         isTopup: [''],
         maxOutstandingLoanBalance: [''],
         interestRateDifferential: [''],

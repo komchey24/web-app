@@ -265,6 +265,15 @@ export class EditLoansAccountComponent extends LoanProductBaseComponent {
     ) {
       delete loansAccountData.isFloatingInterestRate;
     }
+    // Optional target installment total. Send it only when actually filled in - the backend parses it as a decimal,
+    // so an empty string would be rejected, and a blank field must not clear a previously stored amount by accident.
+    if (
+      loansAccountData.installmentAmount === '' ||
+      loansAccountData.installmentAmount === null ||
+      loansAccountData.installmentAmount === undefined
+    ) {
+      delete loansAccountData.installmentAmount;
+    }
     loansAccountData.principal = loansAccountData.principalAmount;
     delete loansAccountData.principalAmount;
     delete loansAccountData.multiDisburseLoan;
