@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { RepaymentSchedule } from 'app/loans/models/loan-account.model';
+import { RepaymentSchedule, RepaymentSchedulePeriod } from 'app/loans/models/loan-account.model';
 
 /**
  * Khmer script needs OpenType shaping, which jsPDF cannot do. This builds a
@@ -18,6 +18,9 @@ import { RepaymentSchedule } from 'app/loans/models/loan-account.model';
  * The layout mirrors the collection sheet in `docs/samples/repayment-table.pdf`:
  * A4 portrait, client/loan facts in two columns, one row per installment and
  * blank columns for penalties, the collector's signature and remarks.
+ *
+ * Long schedules print the installments in two side-by-side halves so they
+ * still fit a single sheet — see SINGLE_COLUMN_MAX_ROWS.
  */
 
 const LABELS = {
@@ -61,6 +64,24 @@ const WEEKDAYS_KM = [
   'សុក្រ',
   'សៅរ៍'
 ];
+
+/**
+ * Above this many installments the single-column table no longer fits one A4
+ * page, so the schedule is printed in two side-by-side halves. Derived from the
+ * ~273mm printable height less the title, the facts block and the signature
+ * footer, at ~28px per row — retune here if that furniture changes.
+ */
+const SINGLE_COLUMN_MAX_ROWS = 22;
+
+/**
+ * Halving the column widths leaves no room for the full headers, and Khmer has
+ * no inter-word spaces to wrap at, so the two-column layout uses these instead.
+ */
+const SHORT_HEADERS = {
+  dueDate: 'ថ្ងៃបង់',
+  totalDue: 'សរុប',
+  receiverSignature: 'ហត្ថលេខា'
+};
 
 export interface KhmerPrintAddress {
   street?: string;
@@ -175,23 +196,51 @@ export function buildKhmerScheduleHtml(
   const lastRepaymentDate = installments[installments.length - 1]?.dueDate;
   const cycle = loan.loanProductCounter ?? loan.loanCounter;
 
+  // Two halves side by side keep a long schedule on one sheet; a short one is
+  // already single-page, so splitting it would only leave a sparse half-table.
+  const twoColumn = installments.length > SINGLE_COLUMN_MAX_ROWS;
+  const rowsPerColumn = twoColumn ? Math.ceil(installments.length / 2) : installments.length;
+  const headers = twoColumn ? { ...LABELS, ...SHORT_HEADERS } : LABELS;
+  const twoColumnClass = (name: string) => (twoColumn ? ` class="${name}"` : '');
+
   const infoRow = (label: string, value: string) =>
     `<div class="info-row"><span class="info-label">${label}</span><span class="info-value">${value}</span></div>`;
 
-  const bodyRows = installments
-    .map(
-      (period) => `
-        <tr>
-          <td class="col-no">${period.period}</td>
-          <td>${formatDate(period.dueDate)}</td>
-          <td>${weekdayKm(period.dueDate)}</td>
-          <td class="amount">${formatAmount(period.totalDueForPeriod, decimalPlaces)}</td>
+  /** `col-divider` draws the thicker rule where the second half starts. */
+  const columnClass = (name: string, rightHalf: boolean) => `${name}${rightHalf ? ' col-divider' : ''}`;
+
+  const headerCells = (rightHalf: boolean) => `
+        <th class="${columnClass('col-no', rightHalf)}">${headers.no}</th>
+        <th class="col-date">${headers.dueDate}</th>
+        <th class="col-day">${headers.day}</th>
+        <th class="col-amount">${headers.totalDue}</th>
+        <th class="col-penalty">${headers.penalties}</th>
+        <th class="col-signature">${headers.receiverSignature}</th>
+        <th class="col-remarks">${headers.remarks}</th>`;
+
+  // An odd installment count leaves the last right-hand slot empty; it still
+  // emits its cells so the grid closes rather than ending mid-row.
+  const bodyCells = (period: RepaymentSchedulePeriod | undefined, rightHalf: boolean) => `
+          <td class="${columnClass('col-no', rightHalf)}">${period ? period.period : ''}</td>
+          <td class="col-date">${period ? formatDate(period.dueDate) : ''}</td>
+          <td class="col-day">${period ? weekdayKm(period.dueDate) : ''}</td>
+          <td class="amount">${period ? formatAmount(period.totalDueForPeriod, decimalPlaces) : ''}</td>
           <td></td>
           <td></td>
-          <td></td>
+          <td></td>`;
+
+  // Down-then-across: installments 1..rowsPerColumn fill the left half, the
+  // rest the right. Every row carries its number, so a schedule long enough to
+  // still need a second sheet stays readable even though the left half there
+  // continues the left sequence rather than following the right half's last row.
+  const bodyRows = Array.from(
+    { length: rowsPerColumn },
+    (_unused, index) => `
+        <tr>${bodyCells(installments[index], false)}${
+          twoColumn ? bodyCells(installments[index + rowsPerColumn], true) : ''
+        }
         </tr>`
-    )
-    .join('');
+  ).join('');
 
   const html = `<!doctype html>
 <html lang="km">
@@ -233,16 +282,37 @@ export function buildKhmerScheduleHtml(
   .col-penalty { width: 14%; }
   .col-signature { width: 22%; }
   .col-remarks { width: 16%; }
+  /* Two halves side by side: each half gets the proportions above, roughly
+     halved, so the 14 widths still sum to 100%. The day column takes a little
+     back from the blank hand-write columns because the longest weekday
+     (ព្រហស្បតិ៍) would otherwise spill into the amount beside it. */
+  .two-column .col-no { width: 3.5%; }
+  .two-column .col-date { width: 8%; }
+  .two-column .col-day { width: 7%; }
+  .two-column .col-amount { width: 8.5%; }
+  .two-column .col-penalty { width: 6%; }
+  .two-column .col-signature { width: 10.5%; }
+  .two-column .col-remarks { width: 6.5%; }
+  .two-column th, .two-column td { padding: 3px 2px; height: 20px; }
+  .two-column td { font-size: 10px; }
+  .two-column td.col-date, .two-column td.col-day { font-size: 9px; }
+  /* Khmer has no inter-word spaces to wrap at, so let a header break anywhere
+     rather than overflow its cell, even with the shortened labels. */
+  .two-column th { font-size: 9px; line-height: 1.3; overflow-wrap: anywhere; }
+  .two-column .col-divider { border-left-width: 3px; }
   thead { display: table-header-group; }
   tr { break-inside: avoid; }
   .sign-labels { display: flex; justify-content: space-between; margin-top: 8px; }
   .signatures { display: flex; justify-content: space-between; margin-top: 96px; break-inside: avoid; }
+  /* The footer is what tips a nearly-full two-column table onto a second
+     sheet, so it signs closer to the table there — still room to sign. */
+  .two-column-page .signatures { margin-top: 56px; }
   .signature { width: 240px; }
   .signature-line { border-top: 1px solid #000; }
   .signature-date { display: flex; gap: 40px; padding-top: 4px; }
 </style>
 </head>
-<body>
+<body${twoColumnClass('two-column-page')}>
   <h1>${LABELS.title}</h1>
   <div class="info">
     <div class="info-col info-col-left">
@@ -264,16 +334,9 @@ export function buildKhmerScheduleHtml(
       ${infoRow(LABELS.cycle, cycle != null ? `${LABELS.cyclePrefix}${cycle}` : '')}
     </div>
   </div>
-  <table>
+  <table${twoColumnClass('two-column')}>
     <thead>
-      <tr>
-        <th class="col-no">${LABELS.no}</th>
-        <th class="col-date">${LABELS.dueDate}</th>
-        <th class="col-day">${LABELS.day}</th>
-        <th class="col-amount">${LABELS.totalDue}</th>
-        <th class="col-penalty">${LABELS.penalties}</th>
-        <th class="col-signature">${LABELS.receiverSignature}</th>
-        <th class="col-remarks">${LABELS.remarks}</th>
+      <tr>${headerCells(false)}${twoColumn ? headerCells(true) : ''}
       </tr>
     </thead>
     <tbody>${bodyRows}</tbody>
