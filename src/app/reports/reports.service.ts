@@ -11,8 +11,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 /** rxjs Imports */
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 /** Custom Models */
 import { ReportParameter } from './common-models/report-parameter.model';
@@ -83,6 +83,39 @@ export class ReportsService {
       httpParams = httpParams.set(key, value);
     }
     return this.http.get(`/runreports/${reportName}`, { params: httpParams });
+  }
+
+  /**
+   * Export targets the platform offers for a report.
+   *
+   * Which targets exist depends on server configuration, so this is the reliable way to find out
+   * whether an export can be offered rather than assuming it. Failures resolve to an empty list so
+   * that a missing or older backend simply offers nothing extra.
+   * @param {string} reportName report name
+   * @returns {Observable<string[]>} query parameter of each available export target
+   */
+  getAvailableExports(reportName: string): Observable<string[]> {
+    return this.http.get(`/runreports/availableExports/${reportName}`).pipe(
+      map((response: any) => (response || []).map((exportType: any) => exportType.queryParameter)),
+      catchError(() => of([]))
+    );
+  }
+
+  /**
+   * Runs a report and returns it as a PDF laid out by the platform's report template.
+   * @param {string} reportName report name
+   * @param {object} formData Form Data.
+   * @returns {Observable<Blob>}
+   */
+  getRunReportAsPdf(reportName: string, formData: object): Observable<Blob> {
+    let httpParams = new HttpParams().set('exportPdfTemplate', 'true');
+    for (const [
+      key,
+      value
+    ] of Object.entries(formData)) {
+      httpParams = httpParams.set(key, value);
+    }
+    return this.http.get(`/runreports/${reportName}`, { responseType: 'blob', params: httpParams });
   }
 
   /**

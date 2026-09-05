@@ -23,6 +23,7 @@ import {
   MatRowDef,
   MatRow
 } from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
 import { DecimalPipe } from '@angular/common';
 
 /** Custom Servies */
@@ -62,6 +63,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator,
+    MatTooltip,
     FaIconComponent,
     MatIcon
   ]
@@ -90,6 +92,8 @@ export class TableAndSmsComponent implements OnChanges {
   notExistsReportData = false;
   hasError = false;
   toBeExportedToRepo = false;
+  /** Whether the platform offers the templated PDF export for this report */
+  pdfExportAvailable = false;
 
   /** Paginator for run-report table. */
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -102,7 +106,28 @@ export class TableAndSmsComponent implements OnChanges {
     this.hasError = false;
     this.columnTypes = [];
     this.displayedColumns = [];
+    this.checkPdfExportAvailability();
     this.getRunReportData();
+  }
+
+  /**
+   * Asks the platform which export targets this report supports.
+   *
+   * The templated PDF export is only registered when a rendering service is configured, so the
+   * button stays hidden on deployments without one rather than offering a download that fails.
+   */
+  private checkPdfExportAvailability() {
+    this.pdfExportAvailable = false;
+    if (this.dataObject.report.type !== 'Table') {
+      return;
+    }
+    this.reportsService
+      .getAvailableExports(this.dataObject.report.name)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((queryParameters: string[]) => {
+        this.pdfExportAvailable = queryParameters.includes('exportPdfTemplate');
+        this.cdr.markForCheck();
+      });
   }
 
   getRunReportData() {
@@ -216,6 +241,28 @@ export class TableAndSmsComponent implements OnChanges {
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     downloadBlob(blob, fileName);
+  }
+
+  /**
+   * Downloads the report as a PDF laid out by the platform's report template.
+   *
+   * Unlike the CSV and XLS exports the document is built server side, which is what allows
+   * non-Latin scripts to be shaped correctly.
+   */
+  exportToPdf(): void {
+    this.progressBarService.increase();
+    this.reportsService
+      .getRunReportAsPdf(this.dataObject.report.name, this.dataObject.formData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blob: Blob) => {
+          downloadBlob(blob, `${this.dataObject.report.name}.pdf`);
+          this.progressBarService.decrease();
+        },
+        error: () => {
+          this.progressBarService.decrease();
+        }
+      });
   }
 
   /**

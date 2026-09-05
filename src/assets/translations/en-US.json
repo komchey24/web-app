@@ -3787,6 +3787,7 @@
       "Entity Data Table Checks Organization": "Define Entity Data Table Checks for Organization",
       "Entity to Entity Mapping": "Entity to Entity Mapping",
       "Export output data to S3 repository": "Export output data to S3 repository",
+      "Export the data to PDF file": "Export the data to PDF file",
       "External Asset Owner": "External Asset Owner",
       "External Events configuration, to enable or disable": "External Events configuration, to enable or disable the event publication",
       "External Services": "External Services",

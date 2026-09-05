@@ -40,6 +40,17 @@
                 <fa-icon icon="download"></fa-icon>
                 {{ 'labels.buttons.Export XLS' | translate }}
               </button>
+              @if (pdfExportAvailable) {
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  (click)="exportToPdf()"
+                  matTooltip="{{ 'labels.text.Export the data to PDF file' | translate }}"
+                >
+                  <fa-icon icon="file-pdf"></fa-icon>
+                  {{ 'labels.buttons.Export to PDF' | translate }}
+                </button>
+              }
             </div>
           }
         </div>
