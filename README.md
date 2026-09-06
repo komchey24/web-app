@@ -378,6 +378,7 @@ MIFOS_PASSWORD_REGEX=^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,50}$
 | ---------------------------------- | -------------------------------------------------- | ------------- |
 | MIFOS_DISPLAY_TENANT_SELECTOR      | Display tenant selector in Login view              | true          |
 | MIFOS_DISPLAY_BACKEND_INFO         | Display backend info in footer                     | true          |
+| MIFOS_DISPLAY_WARNING_DIALOG       | Display authorized-use warning dialog after login  | false         |
 | MIFOS_PRODUCTION_MODE              | Show minimal production hero on login page         | false         |
 | MIFOS_ALLOW_SERVER_SWITCH_SELECTOR | Display DNS server list                            | true          |
 | MIFOS_COMPLIANCE_HIDE_CLIENT_DATA  | Hide client names in UI (mask with \*)             | false         |

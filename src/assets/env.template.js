@@ -46,6 +46,9 @@
   // Display or not the BackEnd Info
   window['env']['displayBackEndInfo'] = '$MIFOS_DISPLAY_BACKEND_INFO';
 
+  // Display or not the authorized-use warning dialog after login
+  window['env']['displayWarningDialog'] = '$MIFOS_DISPLAY_WARNING_DIALOG';
+
   // Show minimal production hero on login page
   window['env']['productionMode'] = '$MIFOS_PRODUCTION_MODE';
 

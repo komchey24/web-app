@@ -52,6 +52,8 @@ export const environment = {
     scope: loadedEnv.oauthScope || ''
   },
   warningDialog: {
+    /** Disabled by default; set displayWarningDialog to 'true' to show it on login. */
+    enabled: loadedEnv.displayWarningDialog === 'true' || loadedEnv.displayWarningDialog === true,
     title: 'Warning',
     content:
       'This system is for authorized use only. Unauthorized access will result in possible legal action. By accessing this system, you acknowledge that you are authorized to do so and that all data stored and processed here is confidential.',
