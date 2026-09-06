@@ -196,7 +196,7 @@ export class TransactionsTabComponent extends LoanProductBaseComponent implement
     }
     this.transactionsData = this.loanDetailsData.transactions;
     this.hideAccrualsParam = new FormControl<boolean>(true, { nonNullable: true });
-    this.hideReversedParam = new FormControl<boolean>(false, { nonNullable: true });
+    this.hideReversedParam = new FormControl<boolean>(true, { nonNullable: true });
     this.setLoanTransactions();
     if (this.loanProductService.isWorkingCapital) {
       this.paginator.length = this.totalTransactions;
@@ -212,11 +212,7 @@ export class TransactionsTabComponent extends LoanProductBaseComponent implement
         element.date = this.dateUtils.parseDate(element.date);
       }
     });
-    this.dataSource = new MatTableDataSource(this.transactionsData);
-    if (this.loanProductService.isLoanProduct) {
-      this.dataSource.paginator = this.paginator;
-    }
-    this.dataSource.sort = this.sort;
+    this.filterTransactions(this.hideReversedParam.value, this.hideAccrualsParam.value);
   }
 
   /**

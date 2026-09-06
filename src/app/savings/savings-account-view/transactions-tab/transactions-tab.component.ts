@@ -143,8 +143,9 @@ export class TransactionsTabComponent implements OnInit {
 
   ngOnInit() {
     this.hideAccrualsParam = new FormControl(false);
-    this.hideReversedParam = new FormControl(false);
+    this.hideReversedParam = new FormControl(true);
     this.setTransactions();
+    this.filterTransactions(this.hideReversedParam.value, this.hideAccrualsParam.value);
   }
 
   setTransactions(): void {
