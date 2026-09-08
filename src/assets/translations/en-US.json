@@ -792,7 +792,9 @@
       "All": "All",
       "Pause Breach": "Pause Breach",
       "Resume Breach": "Resume Breach",
-      "Currency Conversion": "Currency Conversion"
+      "Currency Conversion": "Currency Conversion",
+      "HTML Source": "HTML Source",
+      "Rich Text": "Rich Text"
     },
     "catalogs": {
       "% Amount": "% Amount",
@@ -1620,7 +1622,8 @@
       "Location Map": "Location Map",
       "Services": "Services",
       "Currency Conversion": "Currency Conversion",
-      "Schedules": "Schedules"
+      "Schedules": "Schedules",
+      "Change Entity": "Change Entity"
     },
     "inputs": {
       "Breach Actions": "Breach Actions",
@@ -3466,7 +3469,8 @@
       "Are you sure you want to": "Are you sure you want to ",
       "the productmix component with id": "the productmix component with id",
       "the Reschedule Loan": " the Reschedule Loan",
-      "the Transaction Type": "the Transaction Type"
+      "the Transaction Type": "the Transaction Type",
+      "Changing the entity clears the template text": "Changing the entity clears the template text, which cannot be undone. Continue"
     },
     "text": {
       "Adjust Installment Amount Hint": "Sets every installment to this total (principal + interest). Interest is adjusted to absorb the difference. Fees and penalties are added on top.",
@@ -4385,7 +4389,9 @@
       "WorkingCapitalLoanChargeAdjustmentPreBusinessEvent": "Working Capital Loan Charge Adjustment Pre Business Event",
       "WorkingCapitalLoanChargeAdjustmentPostBusinessEvent": "Working Capital Loan Charge Adjustment Post Business Event",
       "SavingsAccountForceWithdrawalBusinessEvent": "Savings Account Force Withdrawal Business Event",
-      "Map tiles unavailable": "Map tiles unavailable"
+      "Map tiles unavailable": "Map tiles unavailable",
+      "Template preview runs without scripts": "Preview is rendered in an isolated frame without running the template scripts.",
+      "This template is edited as HTML source": "This template is a full HTML document, so it is edited as source to keep its styles, scripts and Mustache tags intact."
     },
     "permissions": {
       "actions": {

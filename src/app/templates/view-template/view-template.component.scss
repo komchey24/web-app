@@ -7,12 +7,43 @@
  */
 
 .container {
-  max-width: 37rem;
+  // Wide enough for a full page template — the report templates are A4 landscape documents.
+  max-width: 64rem;
 
   .content {
     div {
       margin: 1rem 0;
       overflow-wrap: break-word;
     }
+  }
+}
+
+.template-text {
+  // The frame carries its own document, so the template's own styles stay out of the app.
+  .template-preview {
+    width: 100%;
+    height: 32rem;
+    border: 1px solid rgb(0 0 0 / 12%);
+    border-radius: 4px;
+    background: #fff;
+  }
+
+  .preview-note {
+    margin: 8px 0 0;
+    opacity: 0.7;
+  }
+
+  .template-source {
+    max-height: 32rem;
+    margin: 0;
+    padding: 16px;
+    overflow: auto;
+    border: 1px solid rgb(0 0 0 / 12%);
+    border-radius: 4px;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre;
+    tab-size: 2;
   }
 }

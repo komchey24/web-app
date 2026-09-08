@@ -96,15 +96,57 @@
 
     <mat-card-content>
       <div role="editor" class="editor-wrapper">
-        <label for="template-text-editor" class="required-label required-label-editor">
-          {{ 'labels.inputs.Text' | translate }} <span class="required-asterisk">*</span>
-        </label>
-        @if (editorVisible) {
+        <div class="layout-row layout-align-space-between-center gap-16px responsive-column editor-header">
+          <label
+            [attr.for]="editorMode === 'code' ? 'template-text-source' : 'template-text-editor'"
+            class="required-label required-label-editor"
+          >
+            {{ 'labels.inputs.Text' | translate }} <span class="required-asterisk">*</span>
+          </label>
+          <mat-button-toggle-group
+            [value]="editorMode"
+            (change)="setEditorMode($event.value)"
+            aria-label="{{ 'labels.inputs.Text' | translate }}"
+          >
+            <mat-button-toggle value="rich" [disabled]="textNeedsSourceEditor">
+              {{ 'labels.buttons.Rich Text' | translate }}
+            </mat-button-toggle>
+            <mat-button-toggle value="code">
+              {{ 'labels.buttons.HTML Source' | translate }}
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        @if (editorMode === 'code') {
+          @if (textNeedsSourceEditor) {
+            <p class="mat-caption editor-note">
+              {{ 'labels.text.This template is edited as HTML source' | translate }}
+            </p>
+          }
+          <mat-form-field class="flex-fill source-field">
+            <mat-label>{{ 'labels.inputs.Text' | translate }}</mat-label>
+            <textarea
+              id="template-text-source"
+              #sourceEditor
+              matInput
+              required
+              rows="20"
+              spellcheck="false"
+              [formControl]="templateForm.controls.text"
+            ></textarea>
+            @if (templateForm.controls.text.hasError('required')) {
+              <mat-error>
+                {{ 'labels.inputs.Text' | translate }} {{ 'labels.commons.is' | translate }}
+                <strong>{{ 'labels.commons.required' | translate }}</strong>
+              </mat-error>
+            }
+          </mat-form-field>
+        } @else if (editorVisible) {
           <editor
             id="template-text-editor"
             #tinymceEditor
             [init]="tinymceConfig"
-            [initialValue]="templateData.template?.text || ''"
+            [initialValue]="templateForm.controls.text.value || ''"
             licenseKey="gpl"
             [formControl]="templateForm.controls.text"
           ></editor>

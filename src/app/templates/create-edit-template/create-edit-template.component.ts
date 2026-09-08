@@ -7,10 +7,21 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild, inject, DestroyRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  inject,
+  DestroyRef
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, FormBuilder, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Imports */
 import { clientParameterLabels, loanParameterLabels, repaymentParameterLabels } from '../template-parameter-labels';
@@ -26,7 +37,10 @@ import {
   MatExpansionPanelHeader,
   MatExpansionPanelTitle
 } from '@angular/material/expansion';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { isAdvancedTemplateText } from '../template-text.utils';
 
 /**
  * Create Template Component.
@@ -42,7 +56,9 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatAccordion,
     MatExpansionPanel,
     MatExpansionPanelHeader,
-    MatExpansionPanelTitle
+    MatExpansionPanelTitle,
+    MatButtonToggleGroup,
+    MatButtonToggle
   ],
   providers: [
     {
@@ -59,10 +75,20 @@ export class CreateEditComponent implements OnInit {
   private templateService = inject(TemplatesService);
   private themingService = inject(ThemingService);
   private destroyRef = inject(DestroyRef);
+  private dialog = inject(MatDialog);
+  private translateService = inject(TranslateService);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   themeKey = 'light';
 
   editorVisible = true;
+
+  /**
+   * How the template text is edited. TinyMCE parses its input as a body fragment, so a full HTML
+   * document — doctype, head, style, script — or a Mustache section tag does not survive a round
+   * trip through it. Those templates are edited as source instead.
+   */
+  editorMode: 'rich' | 'code' = 'rich';
 
   get tinymceConfig() {
     const isDark = this.themeKey === 'dark-theme';
@@ -87,6 +113,8 @@ export class CreateEditComponent implements OnInit {
   }
   /** TinyMCE component reference */
   @ViewChild('tinymceEditor', { static: false }) tinymceEditor: EditorComponent;
+  /** Source editor reference, used in code mode. */
+  @ViewChild('sourceEditor', { static: false }) sourceEditor: ElementRef<HTMLTextAreaElement>;
 
   /** Template form. */
   templateForm: FormGroup;
@@ -137,7 +165,35 @@ export class CreateEditComponent implements OnInit {
 
   ngOnInit() {
     this.createTemplateForm();
+    this.editorMode = isAdvancedTemplateText(this.templateForm.get('text').value) ? 'code' : 'rich';
     this.buildDependencies();
+  }
+
+  /**
+   * Switches between the rich text editor and the source editor, carrying the current text across.
+   * @param {'rich' | 'code'} mode Editor mode.
+   */
+  setEditorMode(mode: 'rich' | 'code') {
+    if (mode === this.editorMode) {
+      return;
+    }
+    if (this.editorMode === 'rich') {
+      // Take what the editor holds before it is torn down, so the source view opens on it.
+      this.templateForm.get('text').setValue(this.getEditorContent());
+    }
+    this.editorMode = mode;
+    if (mode === 'rich') {
+      // Recreate the editor so it initialises from the text the source view left behind.
+      this.editorVisible = false;
+      setTimeout(() => (this.editorVisible = true));
+    }
+  }
+
+  /**
+   * Whether the current text would be mangled by the rich text editor.
+   */
+  get textNeedsSourceEditor(): boolean {
+    return isAdvancedTemplateText(this.templateForm?.get('text')?.value);
   }
 
   /**
@@ -189,32 +245,71 @@ export class CreateEditComponent implements OnInit {
    * Subscribe to value changes of entity to set default mapper.
    */
   buildDependencies() {
-    const tenantIdentifier = 'default'; // update once global settings are setup.
+    /** The entity the mapper and the text currently belong to, so a cancelled switch can be undone. */
+    let appliedEntity = this.templateForm.get('entity').value;
     this.templateForm
       .get('entity')
       .valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value: any) => {
-        if (value === 0) {
-          // client
-          this.mappers.splice(0, 1, {
-            mappersorder: 0,
-            mapperskey: new FormControl('client'),
-            mappersvalue: new FormControl('clients/{{clientId}}?tenantIdentifier=' + tenantIdentifier)
-          });
-        } else {
-          // loan
-          this.mappers.splice(0, 1, {
-            mappersorder: 0,
-            mapperskey: new FormControl('loan'),
-            mappersvalue: new FormControl('loans/{{loanId}}?associations=all&tenantIdentifier=' + tenantIdentifier)
-          });
+        // Switching entity swaps the default mapper and drops the text, whose parameters belong to
+        // the entity being left behind. There is nothing to lose while the text is still empty.
+        if (!(this.templateForm.get('text').value || '').trim()) {
+          this.applyEntity(value);
+          appliedEntity = value;
+          return;
         }
-        this.setEditorContent('');
-        this.templateForm.get('text').setValue('');
+        // A template can be hundreds of lines of hand written HTML and there is no undo, so the
+        // text is never discarded without asking.
+        const confirmationDialogRef = this.dialog.open(ConfirmationDialogComponent, {
+          data: {
+            heading: this.translateService.instant('labels.heading.Change Entity'),
+            dialogContext: this.translateService.instant(
+              'labels.dialogContext.Changing the entity clears the template text'
+            ),
+            type: 'Strong'
+          }
+        });
+        confirmationDialogRef.afterClosed().subscribe((response: { confirm?: boolean }) => {
+          if (response?.confirm) {
+            this.applyEntity(value);
+            appliedEntity = value;
+          } else {
+            // Cancelling has to leave the form exactly as it was, dropdown included. Silencing the
+            // event keeps this restore from re-entering the subscription.
+            this.templateForm.get('entity').setValue(appliedEntity, { emitEvent: false });
+          }
+          this.changeDetectorRef.markForCheck();
+        });
       });
     if (this.mode === 'create') {
       this.templateForm.get('entity').patchValue(0);
     }
+  }
+
+  /**
+   * Installs the default mapper for an entity and clears the text written for the previous one.
+   * @param {any} entity Entity id.
+   */
+  private applyEntity(entity: any) {
+    const tenantIdentifier = 'default'; // update once global settings are setup.
+    if (entity === 0) {
+      // client
+      this.mappers.splice(0, 1, {
+        mappersorder: 0,
+        mapperskey: new FormControl('client'),
+        mappersvalue: new FormControl('clients/{{clientId}}?tenantIdentifier=' + tenantIdentifier)
+      });
+    } else {
+      // loan
+      this.mappers.splice(0, 1, {
+        mappersorder: 0,
+        mapperskey: new FormControl('loan'),
+        mappersvalue: new FormControl('loans/{{loanId}}?associations=all&tenantIdentifier=' + tenantIdentifier)
+      });
+    }
+    this.setEditorContent('');
+    this.templateForm.get('text').setValue('');
+    this.editorMode = 'rich';
   }
 
   /**
@@ -241,13 +336,32 @@ export class CreateEditComponent implements OnInit {
    * @param {string} label Template parameter label.
    */
   addText(label: string) {
-    this.tinymceEditor?.editor?.insertContent(label);
+    if (this.editorMode === 'rich') {
+      this.tinymceEditor?.editor?.insertContent(label);
+      return;
+    }
+    const textarea = this.sourceEditor?.nativeElement;
+    if (!textarea) {
+      return;
+    }
+    const text: string = this.templateForm.get('text').value || '';
+    const start = textarea.selectionStart ?? text.length;
+    const end = textarea.selectionEnd ?? text.length;
+    this.templateForm.get('text').setValue(text.slice(0, start) + label + text.slice(end));
+    // Leave the caret after the label that was just inserted.
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + label.length, start + label.length);
+    });
   }
 
   /**
    * Gets the contents of the editor.
    */
   getEditorContent() {
+    if (this.editorMode === 'code') {
+      return this.templateForm.get('text').value || '';
+    }
     return this.tinymceEditor?.editor?.getContent({ format: 'html' }) || '';
   }
 

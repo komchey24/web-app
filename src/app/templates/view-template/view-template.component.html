@@ -45,12 +45,36 @@
         <div class="flex-50">
           {{ templateData.type }}
         </div>
+      </div>
 
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Text' | translate }}
+      <div class="template-text m-t-16">
+        <div class="layout-row layout-align-start-center gap-16px m-b-8 responsive-column">
+          <span class="mat-body-strong">{{ 'labels.inputs.Text' | translate }}</span>
+          <mat-button-toggle-group
+            [value]="textView"
+            (change)="textView = $event.value"
+            aria-label="{{ 'labels.inputs.Text' | translate }}"
+          >
+            <mat-button-toggle value="preview">{{ 'labels.buttons.Preview' | translate }}</mat-button-toggle>
+            <mat-button-toggle value="source">{{ 'labels.buttons.HTML Source' | translate }}</mat-button-toggle>
+          </mat-button-toggle-group>
         </div>
 
-        <div class="flex-50" [innerHTML]="templateData.text"></div>
+        @if (textView === 'preview') {
+          <iframe
+            class="template-preview"
+            title="{{ 'labels.buttons.Preview' | translate }}"
+            sandbox
+            [srcdoc]="previewDocument"
+          ></iframe>
+          @if (isAdvancedTemplate) {
+            <p class="mat-caption preview-note">
+              {{ 'labels.text.Template preview runs without scripts' | translate }}
+            </p>
+          }
+        } @else {
+          <pre class="template-source"><code>{{ templateData.text }}</code></pre>
+        }
       </div>
     </mat-card-content>
   </mat-card>
