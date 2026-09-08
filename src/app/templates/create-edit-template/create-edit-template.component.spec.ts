@@ -167,6 +167,33 @@ describe('CreateEditComponent', () => {
     expect(dialog.open).not.toHaveBeenCalled();
   });
 
+  it('builds the form for a template stored without an entity or type', () => {
+    const unassigned = {
+      ...templateData,
+      template: { ...templateData.template, entity: undefined as string, type: undefined as string }
+    };
+
+    const component = createComponent('edit', unassigned);
+
+    expect(component.templateForm.get('entity').value).toBeNull();
+    expect(component.templateForm.get('type').value).toBeNull();
+    // Submit stays blocked until the missing entity and type are picked.
+    expect(component.templateForm.valid).toBe(false);
+  });
+
+  it('does not offer to clear the text when an entity is assigned for the first time', () => {
+    const component = createComponent('edit', {
+      ...templateData,
+      template: { ...templateData.template, entity: undefined as string, type: undefined as string }
+    });
+
+    component.templateForm.get('entity').setValue(1);
+
+    expect(dialog.open).not.toHaveBeenCalled();
+    expect(component.templateForm.get('text').value).toBe(templateData.template.text);
+    expect(component.templateForm.get('entity').value).toBe(1);
+  });
+
   it('does not add an id to the create payload', () => {
     const component = createComponent('create');
     component.templateForm.patchValue({

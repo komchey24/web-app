@@ -28,6 +28,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
+/** Custom Imports */
+import { templateOptionName } from './template.utils';
+
 /**
  * Templates component.
  */
@@ -82,6 +85,15 @@ export class TemplatesComponent implements OnInit {
     this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { templates: any }) => {
       this.templatesData = data.templates;
     });
+  }
+
+  /**
+   * The entity or type name to show for a template, blank when the template has none assigned.
+   * @param {any} value Raw entity or type from the API.
+   * @returns {string} Display name.
+   */
+  optionName(value: any): string {
+    return templateOptionName(value);
   }
 
   /**

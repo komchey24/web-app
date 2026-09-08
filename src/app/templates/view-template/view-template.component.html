@@ -21,34 +21,25 @@
 <div class="container">
   <mat-card>
     <mat-card-content>
-      <div class="layout-row-wrap">
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.name' | translate }}
+      <dl class="template-details">
+        <div class="detail">
+          <dt class="mat-body-strong">{{ 'labels.inputs.name' | translate }}</dt>
+          <dd>{{ templateData.name }}</dd>
         </div>
 
-        <div class="flex-50">
-          {{ templateData.name }}
+        <div class="detail">
+          <dt class="mat-body-strong">{{ 'labels.inputs.Entity' | translate }}</dt>
+          <dd [class.unassigned]="!entityName">{{ entityName || ('labels.text.Not assigned' | translate) }}</dd>
         </div>
 
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Entity' | translate }}
+        <div class="detail">
+          <dt class="mat-body-strong">{{ 'labels.inputs.Type' | translate }}</dt>
+          <dd [class.unassigned]="!typeName">{{ typeName || ('labels.text.Not assigned' | translate) }}</dd>
         </div>
+      </dl>
 
-        <div class="flex-50">
-          {{ templateData.entity }}
-        </div>
-
-        <div class="flex-50 mat-body-strong">
-          {{ 'labels.inputs.Type' | translate }}
-        </div>
-
-        <div class="flex-50">
-          {{ templateData.type }}
-        </div>
-      </div>
-
-      <div class="template-text m-t-16">
-        <div class="layout-row layout-align-start-center gap-16px m-b-8 responsive-column">
+      <div class="template-text">
+        <div class="text-header">
           <span class="mat-body-strong">{{ 'labels.inputs.Text' | translate }}</span>
           <mat-button-toggle-group
             [value]="textView"

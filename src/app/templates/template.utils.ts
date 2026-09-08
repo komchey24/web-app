@@ -50,3 +50,32 @@ export function wrapTemplateTextForPreview(text: string): string {
     table { border-collapse: collapse; }
   </style></head><body>${content}</body></html>`;
 }
+
+/**
+ * Fineract serialises a template's entity and type as the name of the referenced row — `"client"`,
+ * `"Document"` — and omits the field entirely when the template has none, which is what a template
+ * inserted straight into `m_template` with a null `entity_id`/`type_id` looks like. Some payloads
+ * carry the whole `{ id, name }` row instead, so both shapes are read here.
+ * @param {any} value Raw entity or type from the API.
+ * @returns {string} The name, or an empty string when the template has none.
+ */
+export function templateOptionName(value: any): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  return typeof value === 'string' ? value : (value.name ?? '');
+}
+
+/**
+ * Resolves the dropdown id for a template's entity or type. Returns null when the template has
+ * none, so the required validator holds Submit until one is picked rather than the form blowing up
+ * on a missing option.
+ * @param {any[]} options Entities or types offered by the template endpoint.
+ * @param {any} value Raw entity or type from the API.
+ * @returns {any} The matching option id, or null.
+ */
+export function templateOptionId(options: any[], value: any): any {
+  const name = templateOptionName(value);
+  const match = (options || []).find((option: any) => option.name === name);
+  return match ? match.id : null;
+}

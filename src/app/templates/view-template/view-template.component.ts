@@ -23,7 +23,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
 /** Custom Imports */
-import { isAdvancedTemplateText, wrapTemplateTextForPreview } from '../template-text.utils';
+import { isAdvancedTemplateText, templateOptionName, wrapTemplateTextForPreview } from '../template.utils';
 
 /**
  * View Template Component.
@@ -56,6 +56,10 @@ export class ViewTemplateComponent {
   previewDocument: SafeHtml = '';
   /** True when the text is a full HTML document or carries styles, scripts or Mustache sections. */
   isAdvancedTemplate = false;
+  /** Entity name, blank when the template has none assigned. */
+  entityName = '';
+  /** Type name, blank when the template has none assigned. */
+  typeName = '';
 
   /**
    * Retrieves the template data from `resolve`.
@@ -69,6 +73,8 @@ export class ViewTemplateComponent {
       this.templateData = data.template;
       const text: string = this.templateData?.text || '';
       this.isAdvancedTemplate = isAdvancedTemplateText(text);
+      this.entityName = templateOptionName(this.templateData?.entity);
+      this.typeName = templateOptionName(this.templateData?.type);
       // The frame is fully sandboxed, so the document it is handed can never touch the app.
       this.previewDocument = this.sanitizer.bypassSecurityTrustHtml(wrapTemplateTextForPreview(text));
     });

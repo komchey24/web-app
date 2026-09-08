@@ -40,7 +40,7 @@ import {
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
-import { isAdvancedTemplateText } from '../template-text.utils';
+import { isAdvancedTemplateText, templateOptionId } from '../template.utils';
 
 /**
  * Create Template Component.
@@ -222,11 +222,11 @@ export class CreateEditComponent implements OnInit {
     } else {
       this.templateForm = this.formBuilder.group({
         entity: [
-          this.templateData.entities.find((entity: any) => entity.name === this.templateData.template.entity).id,
+          templateOptionId(this.templateData.entities, this.templateData.template.entity),
           Validators.required
         ],
         type: [
-          this.templateData.types.find((type: any) => type.name === this.templateData.template.type).id,
+          templateOptionId(this.templateData.types, this.templateData.template.type),
           Validators.required
         ],
         name: [
@@ -251,10 +251,17 @@ export class CreateEditComponent implements OnInit {
       .get('entity')
       .valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value: any) => {
+        // A template stored without an entity — Fineract omits the field when `m_template.entity_id`
+        // is null — is being given one for the first time, not moved off one. Nothing was written
+        // for a previous entity, so nothing is discarded.
+        const hadEntity = appliedEntity !== null && appliedEntity !== undefined && appliedEntity !== '';
         // Switching entity swaps the default mapper and drops the text, whose parameters belong to
         // the entity being left behind. There is nothing to lose while the text is still empty.
-        if (!(this.templateForm.get('text').value || '').trim()) {
-          this.applyEntity(value);
+        if (!hadEntity || !(this.templateForm.get('text').value || '').trim()) {
+          this.applyMapper(value);
+          if (hadEntity) {
+            this.clearText();
+          }
           appliedEntity = value;
           return;
         }
@@ -271,7 +278,8 @@ export class CreateEditComponent implements OnInit {
         });
         confirmationDialogRef.afterClosed().subscribe((response: { confirm?: boolean }) => {
           if (response?.confirm) {
-            this.applyEntity(value);
+            this.applyMapper(value);
+            this.clearText();
             appliedEntity = value;
           } else {
             // Cancelling has to leave the form exactly as it was, dropdown included. Silencing the
@@ -287,10 +295,10 @@ export class CreateEditComponent implements OnInit {
   }
 
   /**
-   * Installs the default mapper for an entity and clears the text written for the previous one.
+   * Installs the default mapper for an entity.
    * @param {any} entity Entity id.
    */
-  private applyEntity(entity: any) {
+  private applyMapper(entity: any) {
     const tenantIdentifier = 'default'; // update once global settings are setup.
     if (entity === 0) {
       // client
@@ -307,6 +315,12 @@ export class CreateEditComponent implements OnInit {
         mappersvalue: new FormControl('loans/{{loanId}}?associations=all&tenantIdentifier=' + tenantIdentifier)
       });
     }
+  }
+
+  /**
+   * Discards the text written for the entity being left behind.
+   */
+  private clearText() {
     this.setEditorContent('');
     this.templateForm.get('text').setValue('');
     this.editorMode = 'rich';

@@ -9,18 +9,53 @@
 .container {
   // Wide enough for a full page template — the report templates are A4 landscape documents.
   max-width: 64rem;
+}
 
-  .content {
-    div {
-      margin: 1rem 0;
-      overflow-wrap: break-word;
-    }
+// Label/value pairs, kept together rather than pushed to opposite edges of a wide card.
+.template-details {
+  margin: 0 0 24px;
+
+  // One label/value pair per row; the value drops under its label on a narrow screen.
+  .detail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+    overflow-wrap: break-word;
+  }
+
+  dt {
+    flex: 0 0 12rem;
+  }
+
+  dd {
+    flex: 1 1 16rem;
+  }
+
+  .unassigned {
+    font-style: italic;
+    opacity: 0.6;
   }
 }
 
 .template-text {
+  .text-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
   // The frame carries its own document, so the template's own styles stay out of the app.
   .template-preview {
+    display: block;
     width: 100%;
     height: 32rem;
     border: 1px solid rgb(0 0 0 / 12%);

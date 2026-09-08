@@ -6,7 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { isAdvancedTemplateText, isFullHtmlDocument, wrapTemplateTextForPreview } from './template-text.utils';
+import {
+  isAdvancedTemplateText,
+  isFullHtmlDocument,
+  templateOptionId,
+  templateOptionName,
+  wrapTemplateTextForPreview
+} from './template.utils';
 
 describe('template text utils', () => {
   describe('isAdvancedTemplateText', () => {
@@ -47,6 +53,40 @@ describe('template text utils', () => {
 
     it('handles empty text', () => {
       expect(wrapTemplateTextForPreview('')).toContain('<body></body>');
+    });
+  });
+
+  describe('templateOptionName', () => {
+    it('reads a name string', () => {
+      expect(templateOptionName('client')).toBe('client');
+    });
+
+    it('reads an object valued entity', () => {
+      expect(templateOptionName({ id: 0, name: 'client' })).toBe('client');
+    });
+
+    it('returns blank when the template has no entity or type', () => {
+      expect(templateOptionName(undefined)).toBe('');
+      expect(templateOptionName(null)).toBe('');
+      expect(templateOptionName({ id: 0 })).toBe('');
+    });
+  });
+
+  describe('templateOptionId', () => {
+    const entities = [
+      { id: 0, name: 'client' },
+      { id: 1, name: 'loan' }
+    ];
+
+    it('resolves the dropdown id', () => {
+      expect(templateOptionId(entities, 'loan')).toBe(1);
+      expect(templateOptionId(entities, { id: 1, name: 'loan' })).toBe(1);
+    });
+
+    it('returns null rather than throwing when the template has none', () => {
+      expect(templateOptionId(entities, undefined)).toBeNull();
+      expect(templateOptionId(entities, 'branch')).toBeNull();
+      expect(templateOptionId(undefined, 'loan')).toBeNull();
     });
   });
 });

@@ -4391,7 +4391,8 @@
       "SavingsAccountForceWithdrawalBusinessEvent": "Savings Account Force Withdrawal Business Event",
       "Map tiles unavailable": "Map tiles unavailable",
       "Template preview runs without scripts": "Preview is rendered in an isolated frame without running the template scripts.",
-      "This template is edited as HTML source": "This template is a full HTML document, so it is edited as source to keep its styles, scripts and Mustache tags intact."
+      "This template is edited as HTML source": "This template is a full HTML document, so it is edited as source to keep its styles, scripts and Mustache tags intact.",
+      "Not assigned": "Not assigned"
     },
     "permissions": {
       "actions": {
