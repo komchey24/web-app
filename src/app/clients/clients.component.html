@@ -93,7 +93,7 @@
       <span></span>
     </div>
 
-    @for (row of dataSource.data; track row.id) {
+    @for (row of visibleRows; track row.id) {
       <div class="list-row" [ngClass]="severity(row)" [routerLink]="[row.id, 'general']">
         <div class="rail"></div>
         <div

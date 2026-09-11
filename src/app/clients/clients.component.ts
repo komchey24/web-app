@@ -95,6 +95,12 @@ export class ClientsComponent implements OnInit, OnDestroy {
     return 'neutral';
   }
 
+  /** True for statuses that take a client out of circulation. */
+  isClosed(row: any): boolean {
+    const sev = this.severity(row);
+    return sev === 'closed' || sev === 'rejected';
+  }
+
   /** Person/Entity label. Falls back to Person when legalForm is absent. */
   legalFormLabel(row: any): string {
     const id = row?.legalForm?.id;
@@ -157,6 +163,9 @@ export class ClientsComponent implements OnInit, OnDestroy {
   sortDirection = '';
   showClosedAccounts = false;
 
+  /** Rows of the current server page left after the closed-clients filter. */
+  visibleRows: any[] = [];
+
   ngOnInit() {
     this.searchInput$
       .pipe(debounceTime(DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
@@ -196,6 +205,20 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   toggleShowClosed() {
     this.showClosedAccounts = !this.showClosedAccounts;
+    this.applyView();
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Applies the closed-clients filter to the page returned by the server.
+   * The Fineract client search endpoint takes only a text term — it has no
+   * status filter — so the filter can only be applied to the loaded page.
+   */
+  private applyView() {
+    const rows = this.dataSource.data;
+    this.visibleRows = this.showClosedAccounts ? rows : rows.filter((row) => !this.isClosed(row));
+    this.existsClientsToFilter = this.visibleRows.length > 0;
+    this.notExistsClientsToFilter = !this.existsClientsToFilter;
   }
 
   search(value: string) {
@@ -253,8 +276,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
         (data: any) => {
           this.dataSource.data = data.content;
           this.totalRows = data.totalElements;
-          this.existsClientsToFilter = data.numberOfElements > 0;
-          this.notExistsClientsToFilter = !this.existsClientsToFilter;
+          this.applyView();
           this.isLoading = false;
           this.cdr.markForCheck();
         },
