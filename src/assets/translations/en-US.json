@@ -794,7 +794,8 @@
       "Resume Breach": "Resume Breach",
       "Currency Conversion": "Currency Conversion",
       "HTML Source": "HTML Source",
-      "Rich Text": "Rich Text"
+      "Rich Text": "Rich Text",
+      "Change Loan": "Change Loan"
     },
     "catalogs": {
       "% Amount": "% Amount",
@@ -1623,7 +1624,10 @@
       "Services": "Services",
       "Currency Conversion": "Currency Conversion",
       "Schedules": "Schedules",
-      "Change Entity": "Change Entity"
+      "Change Entity": "Change Entity",
+      "Repay Loan": "Repay Loan",
+      "Find Loan": "Find Loan",
+      "Repayment Details": "Repayment Details"
     },
     "inputs": {
       "Breach Actions": "Breach Actions",
@@ -3259,7 +3263,12 @@
       "Failed to load bureau data": "Failed to load bureau data",
       "Credit Profile": "Credit Profile",
       "Latitude": "Latitude",
-      "Longitude": "Longitude"
+      "Longitude": "Longitude",
+      "Search By": "Search By",
+      "By Loan Account No": "By loan account no.",
+      "By Client": "By client",
+      "Client Search": "Client name, account no. or mobile no.",
+      "Select Loan Account": "Select Loan Account"
     },
     "links": {
       "Community": "Community",
@@ -3409,7 +3418,8 @@
       "Redeem Shares": "Redeem Shares",
       "Approve Additional Shares": "Approve Additional Shares",
       "Reject Additional Shares": "Reject Additional Shares",
-      "Reporting Dashboard": "Reporting Dashboard"
+      "Reporting Dashboard": "Reporting Dashboard",
+      "Repay Loan": "Repay Loan"
     },
     "placeholders": {
       "# Remittance": "# Remittance",
@@ -4392,7 +4402,10 @@
       "Map tiles unavailable": "Map tiles unavailable",
       "Template preview runs without scripts": "Preview is rendered in an isolated frame without running the template scripts.",
       "This template is edited as HTML source": "This template is a full HTML document, so it is edited as source to keep its styles, scripts and Mustache tags intact.",
-      "Not assigned": "Not assigned"
+      "Not assigned": "Not assigned",
+      "No Repayable Loans Found": "No repayable loans found for this search.",
+      "Only Active Or Overpaid Loans Can Take A Repayment": "Only active or overpaid loans can accept a repayment.",
+      "Refine Your Search": "Too many clients matched. Refine your search."
     },
     "permissions": {
       "actions": {
@@ -4689,6 +4702,7 @@
       "No Data Found": "No Data Found",
       "No Identities Found": "No Identities Found",
       "No Upcoming Charges Found": "No Upcoming Charges Found",
+      "repaymentPostedSuccessfully": "Repayment posted successfully on account {{accountNo}}. Transaction ID: {{transactionId}}",
       "unableToUpdateDiscount": "Unable to update discount.",
       "validationSaved": "Validation data saved successfully.",
       "workingCapitalDiscountUpdated": "Working capital discount was updated successfully."
@@ -5004,7 +5018,8 @@
     "Yes": "Yes",
     "loan product will be active and available to clients": "The date that the loan product will be active and available to clients. If blank, the loan product will be active as soon as it is created.",
     "loan product will become inactive and unavailable to clients": "The date that the loan product will become inactive and unavailable to clients. If blank, the load product will never become inactive.",
-    "Reporting Dashboard": "CB-ILD Reporting Dashboard"
+    "Reporting Dashboard": "CB-ILD Reporting Dashboard",
+    "Repay Loan": "Repay Loan"
   },
   "countries": {
     "AF": "Afghanistan",

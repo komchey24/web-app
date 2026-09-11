@@ -147,6 +147,19 @@
           <a matLine>{{ 'labels.menus.Individual Collection Sheet' | translate }}</a>
         </mat-list-item>
         <mat-list-item
+          [routerLink]="['/repay-loan']"
+          [matTooltipPosition]="tooltipPosition"
+          matTooltip="{{ 'tooltips.Repay Loan' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
+          *mifosxHasPermission="'REPAYMENT_LOAN'"
+        >
+          <mat-icon matListIcon>
+            <fa-icon icon="hand-holding-usd" size="sm"></fa-icon>
+          </mat-icon>
+          <a matLine>{{ 'labels.menus.Repay Loan' | translate }}</a>
+        </mat-list-item>
+        <mat-list-item
           *ngIf="mifosRemittanceEnabled"
           [routerLink]="['/remittances/process']"
           [matTooltipPosition]="tooltipPosition"

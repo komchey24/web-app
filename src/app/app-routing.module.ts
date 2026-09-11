@@ -73,6 +73,10 @@ const routes: Routes = [
     loadChildren: () => import('./remittances/remittances.module').then((m) => m.RemittancesModule)
   },
   {
+    path: 'repay-loan',
+    loadChildren: () => import('./repay-loan/repay-loan.routes').then((m) => m.REPAY_LOAN_ROUTES)
+  },
+  {
     path: 'reports',
     loadChildren: () => import('./reports/reports.module').then((m) => m.ReportsModule)
   },
