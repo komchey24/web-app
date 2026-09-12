@@ -98,10 +98,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   @ViewChild('logo') logo: ElementRef<any>;
   /* Template for popover on logo */
   @ViewChild('templateLogo') templateLogo: TemplateRef<any>;
-  /* Refernce of chart of accounts */
-  @ViewChild('chartOfAccounts') chartOfAccounts: ElementRef<any>;
-  /* Template for popover on chart of accounts */
-  @ViewChild('templateChartOfAccounts') templateChartOfAccounts: TemplateRef<any>;
+  /* Refernce of create journal entry */
+  @ViewChild('createJournalEntry') createJournalEntry: ElementRef<any>;
+  /* Template for popover on create journal entry */
+  @ViewChild('templateCreateJournalEntry') templateCreateJournalEntry: TemplateRef<any>;
 
   /**
    * @param {Router} router Router for navigation.
@@ -250,9 +250,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         this.showPopover(this.templateLogo, this.logo.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showSideNavChartofAccounts && this.chartOfAccounts) {
+    if (this.configurationWizardService.showSideNavChartofAccounts && this.createJournalEntry) {
       setTimeout(() => {
-        this.showPopover(this.templateChartOfAccounts, this.chartOfAccounts.nativeElement, 'top', true);
+        this.showPopover(this.templateCreateJournalEntry, this.createJournalEntry.nativeElement, 'top', true);
       });
     }
   }

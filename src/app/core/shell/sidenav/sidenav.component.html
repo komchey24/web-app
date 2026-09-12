@@ -95,19 +95,6 @@
           </mat-list-item>
         }
         <mat-list-item
-          [routerLink]="['/navigation']"
-          [matTooltipPosition]="tooltipPosition"
-          matTooltip="{{ 'tooltips.Navigation' | translate }}"
-          routerLinkActive="active-menu"
-          [routerLinkActiveOptions]="{ exact: false }"
-          *mifosxHasPermission="'READ_CLIENT'"
-        >
-          <mat-icon matListIcon>
-            <fa-icon icon="location-arrow" size="sm"></fa-icon>
-          </mat-icon>
-          <a matLine #navigation>{{ 'labels.menus.Navigation' | translate }}</a>
-        </mat-list-item>
-        <mat-list-item
           [routerLink]="['/checker-inbox-and-tasks/checker-inbox']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Checker Inbox and Tasks' | translate }}"
@@ -119,32 +106,6 @@
             <i class="fa fa-check"></i>
           </mat-icon>
           <a matLine>{{ 'labels.menus.Checker Inbox and Tasks' | translate }}</a>
-        </mat-list-item>
-        <mat-list-item
-          [routerLink]="['/collections/collection-sheet']"
-          [matTooltipPosition]="tooltipPosition"
-          matTooltip="{{ 'labels.menus.Collection Sheet' | translate }}"
-          routerLinkActive="active-menu"
-          [routerLinkActiveOptions]="{ exact: false }"
-          *mifosxHasPermission="'READ_COLLECTIONSHEET'"
-        >
-          <mat-icon matListIcon>
-            <i class="fa fa-tasks"></i>
-          </mat-icon>
-          <a matLine>{{ 'labels.menus.Collection Sheet' | translate }}</a>
-        </mat-list-item>
-        <mat-list-item
-          [routerLink]="['/collections/individual-collection-sheet']"
-          [matTooltipPosition]="tooltipPosition"
-          matTooltip="{{ 'tooltips.Individual Collection Sheet' | translate }}"
-          routerLinkActive="active-menu"
-          [routerLinkActiveOptions]="{ exact: false }"
-          *mifosxHasPermission="'READ_COLLECTIONSHEET'"
-        >
-          <mat-icon matListIcon>
-            <i class="fa fa-tasks"></i>
-          </mat-icon>
-          <a matLine>{{ 'labels.menus.Individual Collection Sheet' | translate }}</a>
         </mat-list-item>
         <mat-list-item
           [routerLink]="['/repay-loan']"
@@ -210,19 +171,6 @@
             <fa-icon icon="plus" size="sm"></fa-icon>
           </mat-icon>
           <a matLine #createJournalEntry>{{ 'labels.menus.Create Journal Entry' | translate }}</a>
-        </mat-list-item>
-        <mat-list-item
-          [routerLink]="['/accounting/chart-of-accounts']"
-          [matTooltipPosition]="tooltipPosition"
-          matTooltip="{{ 'tooltips.Chart Of Accounts' | translate }}"
-          routerLinkActive="active-menu"
-          [routerLinkActiveOptions]="{ exact: false }"
-          *mifosxHasPermission="'READ_GLACCOUNT'"
-        >
-          <mat-icon matListIcon>
-            <fa-icon icon="sitemap" size="sm"></fa-icon>
-          </mat-icon>
-          <a matLine #chartOfAccounts>{{ 'labels.menus.Chart of Accounts' | translate }}</a>
         </mat-list-item>
         <mat-list-item
           (click)="showKeyboardShortcuts()"
@@ -330,30 +278,6 @@
     <button
       mat-raised-button
       color="primary"
-      (click)="popover.close(); showPopover(templateNavigation, navigation, 'bottom', true)"
-    >
-      {{ 'labels.buttons.Next' | translate }}
-    </button>
-  </div>
-</ng-template>
-
-<ng-template #templateNavigation let-popover="popover">
-  <h2>{{ 'labels.menus.Navigation' | translate }}</h2>
-  <p class="mw300">{{ 'labels.text.User Entity navigation screen' | translate }}</p>
-  <div class="layout-row align-end gap-2px responsive-column">
-    <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
-      {{ 'labels.buttons.Close' | translate }}
-    </button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="popover.close(); showPopover(templateDashboard, dashboard, 'bottom', true)"
-    >
-      {{ 'labels.buttons.Back' | translate }}
-    </button>
-    <button
-      mat-raised-button
-      color="primary"
       (click)="popover.close(); showPopover(templateFrequentPostings, frequentPostings, 'top', true)"
     >
       {{ 'labels.buttons.Next' | translate }}
@@ -371,7 +295,7 @@
     <button
       mat-raised-button
       color="primary"
-      (click)="popover.close(); showPopover(templateNavigation, navigation, 'bottom', true)"
+      (click)="popover.close(); showPopover(templateDashboard, dashboard, 'bottom', true)"
     >
       {{ 'labels.buttons.Back' | translate }}
     </button>
@@ -396,30 +320,6 @@
       mat-raised-button
       color="primary"
       (click)="popover.close(); showPopover(templateFrequentPostings, frequentPostings, 'top', true)"
-    >
-      {{ 'labels.buttons.Back' | translate }}
-    </button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="popover.close(); showPopover(templateChartOfAccounts, chartOfAccounts, 'top', true)"
-    >
-      {{ 'labels.buttons.Next' | translate }}
-    </button>
-  </div>
-</ng-template>
-
-<ng-template #templateChartOfAccounts let-popover="popover">
-  <h2>{{ 'labels.menus.Chart of Accounts' | translate }}</h2>
-  <p class="mw300">{{ 'labels.text.Shortcut accounts screen' | translate }}</p>
-  <div class="layout-row align-end gap-2px responsive-column">
-    <button mat-raised-button color="warn" (click)="popover.close(); configurationWizardService.closeConfigWizard()">
-      {{ 'labels.buttons.Close' | translate }}
-    </button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="popover.close(); showPopover(templateCreateJournalEntry, createJournalEntry, 'top', true)"
     >
       {{ 'labels.buttons.Back' | translate }}
     </button>
