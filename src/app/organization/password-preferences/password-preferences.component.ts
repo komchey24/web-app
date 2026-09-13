@@ -15,6 +15,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 /** Custom Services */
 import { OrganizationService } from '../organization.service';
+import { PasswordPolicyService } from 'app/core/services/password-policy.service';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 
@@ -35,6 +36,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 export class PasswordPreferencesComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private organizationService = inject(OrganizationService);
+  private passwordPolicyService = inject(PasswordPolicyService);
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -115,6 +117,8 @@ export class PasswordPreferencesComponent implements OnInit {
       .updatePasswordPreferences(passwordPreferences)
       .pipe(take(1))
       .subscribe((response: any) => {
+        // Password forms validate against the active policy, which just changed.
+        this.passwordPolicyService.refresh();
         this.router.navigate(['../'], { relativeTo: this.route });
       });
   }

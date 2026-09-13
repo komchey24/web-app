@@ -69,6 +69,11 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
   /** Staff data. */
   staffData: any;
 
+  /** Requirements of the active password validation policy. */
+  get passwordPolicyDescription(): string {
+    return this.passwordsUtility.getPasswordPolicyDescription();
+  }
+
   /* Reference of create user form */
   @ViewChild('userFormRef') userFormRef: ElementRef<any>;
   /* Template for popover on create user form */

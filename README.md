@@ -360,8 +360,11 @@ Password validation for Basic Authentication can be configured via environment v
 
 **Behavior:**
 
-- If `MIFOS_MIN_PASSWORD_LENGTH` is not set, it defaults to `8`.
-- If `MIFOS_PASSWORD_REGEX` is not set, the application falls back to the built-in password validation policy.
+- If `MIFOS_MIN_PASSWORD_LENGTH` is not set, it defaults to `8`. It applies to the Basic Authentication login form.
+- If `MIFOS_PASSWORD_REGEX` is not set, new passwords are validated against the password validation policy that is
+  active on the Fineract instance (Admin > Organization > Password Preferences), which is the policy the server itself
+  enforces. Setting `MIFOS_PASSWORD_REGEX` overrides that policy client side, so only set it when it matches, or is
+  stricter than, the active policy.
 - These settings apply only to Basic Authentication login and user password validation.
 - OAuth/OIDC flows are not affected.
 

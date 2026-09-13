@@ -86,38 +86,18 @@
           </div>
 
           @if (!userForm.controls.sendPasswordToEmail.value) {
-            <mat-form-field class="flex-48">
+            <mat-form-field class="flex-48" subscriptSizing="dynamic">
               <mat-label>{{ 'labels.inputs.Password' | translate }}</mat-label>
               <input matInput required type="password" formControlName="password" />
+              <mat-hint>{{ passwordPolicyDescription }}</mat-hint>
               @if (userForm.controls.password.hasError('required')) {
                 <mat-error>
                   {{ 'labels.inputs.Password' | translate }} {{ 'labels.commons.is' | translate }}
                   <strong>{{ 'labels.commons.required' | translate }}</strong>
                 </mat-error>
               }
-              @if (userForm.controls.password.hasError('minlength')) {
-                <mat-error>
-                  {{ 'labels.commons.Password should be at least' | translate }}
-                  <strong>{{ 'labels.commons.12 characters long' | translate }}</strong>
-                </mat-error>
-              }
-              @if (userForm.controls.password.hasError('maxlength')) {
-                <mat-error>
-                  {{ 'labels.commons.Password should not be more than' | translate }}
-                  <strong>{{ 'labels.commons.50 characters long' | translate }}</strong>
-                </mat-error>
-              }
-              @if (
-                userForm.controls.password.hasError('pattern') &&
-                !(userForm.controls.password.hasError('minlength') || userForm.controls.password.hasError('maxlength'))
-              ) {
-                <mat-error>
-                  {{ 'labels.commons.Password should include a' | translate }}
-                  <strong>{{ 'labels.commons.numeral' | translate }}</strong> {{ 'labels.commons.and at' | translate }}
-                  <strong>{{ 'labels.commons.least one uppercase' | translate }}</strong> ,<strong>{{
-                    'labels.commons.lowercase and special character' | translate
-                  }}</strong>
-                </mat-error>
+              @if (userForm.controls.password.invalid && !userForm.controls.password.hasError('required')) {
+                <mat-error>{{ passwordPolicyDescription }}</mat-error>
               }
             </mat-form-field>
           }

@@ -6,28 +6,51 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { passwordValidator } from './password.validator';
-import { environment } from '../../../environments/environment';
+import { PasswordPolicyRules, PasswordPolicyService } from '../services/password-policy.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PasswordsUtility {
-  minPasswordLength: number = environment.minPasswordLength;
-  private static readonly DEFAULT_PASSWORD_REGEX =
-    '^(?!.*(.)\\1)(?!.*\\s)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\\w\\s]).{8,50}$';
+  private passwordPolicyService = inject(PasswordPolicyService);
 
-  public static PASSWORD_REGEX = environment.passwordRegex || PasswordsUtility.DEFAULT_PASSWORD_REGEX;
+  /** Rules enforced by the active password validation policy. */
+  public get rules(): PasswordPolicyRules {
+    return this.passwordPolicyService.rules();
+  }
 
+  /** Shortest password the active password validation policy accepts. */
+  public get minPasswordLength(): number {
+    return this.rules.minLength;
+  }
+
+  /**
+   * Description of the active password validation policy, ready to be displayed.
+   * @returns {string} Requirements of the active policy.
+   */
+  public getPasswordPolicyDescription(): string {
+    return this.passwordPolicyService.describe();
+  }
+
+  /**
+   * Validators enforcing the active password validation policy.
+   *
+   * The policy is fetched from the server the first time a password is validated;
+   * until it arrives the deployment configured rules apply and the control is
+   * revalidated once the real policy is known.
+   * @returns {ValidatorFn[]} Password validators.
+   */
   public getPasswordValidators(): ValidatorFn[] {
     return [
       Validators.required,
-      Validators.minLength(this.minPasswordLength),
-      Validators.maxLength(50),
-      passwordValidator()
+      passwordValidator(
+        () => this.rules,
+        (control: AbstractControl) => this.passwordPolicyService.ensureLoaded(control)
+      )
     ];
   }
 

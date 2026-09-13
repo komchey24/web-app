@@ -26,7 +26,6 @@ import {
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { PasswordsUtility } from 'app/core/utils/passwords-utility';
-import { environment } from '../../../environments/environment';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { InputPasswordComponent } from '../input-password/input-password.component';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
@@ -55,7 +54,10 @@ export class ChangePasswordDialogComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
   private passwordsUtility = inject(PasswordsUtility);
 
-  minPasswordLength: number = environment.minPasswordLength || 12;
+  /** Requirements of the active password validation policy. */
+  get passwordPolicyDescription(): string {
+    return this.passwordsUtility.getPasswordPolicyDescription();
+  }
 
   /** Change Password Form */
   changePasswordForm: any;

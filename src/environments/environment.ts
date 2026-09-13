@@ -133,9 +133,12 @@ export const environment = {
     loadedEnv.enableClientAddressLocation === 'true' || loadedEnv.enableClientAddressLocation === true || false,
 
   minPasswordLength: resolvedMinPasswordLength,
-  passwordRegex:
-    loadedEnv.passwordRegex ||
-    `^(?!.*(.)\\1)(?!.*\\s)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\\w\\s]).{${resolvedMinPasswordLength},50}$`,
+  /**
+   * Optional override of the password rules enforced client side. When unset the
+   * active Fineract password validation policy (Organization > Password Preferences)
+   * is used instead.
+   */
+  passwordRegex: loadedEnv.passwordRegex || '',
 
   /**
    * Hide client data information (mask client names with *)

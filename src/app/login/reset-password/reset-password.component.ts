@@ -55,6 +55,11 @@ export class ResetPasswordComponent implements OnInit {
   /** True if loading. */
   loading = false;
 
+  /** Requirements of the active password validation policy. */
+  get passwordPolicyDescription(): string {
+    return this.passwordsUtility.getPasswordPolicyDescription();
+  }
+
   /**
    * Creates reset password form.
    *
