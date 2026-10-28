@@ -1,4 +1,4 @@
-name: deploy-s3
+name: deploy-bunny
 
 on:
   push:
@@ -8,12 +8,12 @@ on:
 
 # Cancel an in-flight deploy if a newer commit lands
 concurrency:
-  group: deploy-s3-${{ github.ref }}
+  group: deploy-bunny-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   deploy:
-    name: Build and Deploy to S3
+    name: Build and Deploy to Bunny
     runs-on: ubuntu-latest
     environment: production
 
@@ -33,27 +33,26 @@ jobs:
       - name: Run production build
         run: npm run build
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Sync assets to S3
-        # Build uses --output-hashing=none, so js/css names never change
-        # between releases — keep the cache short to avoid serving stale code.
+      - name: Upload to Bunny Storage
+        env:
+          BUNNY_STORAGE_URL: https://sg.storage.bunnycdn.com/kc24
+          BUNNY_STORAGE_PASSWORD: ${{ secrets.BUNNY_STORAGE_PASSWORD }}
+        working-directory: dist/web-app/browser
+        # Storage API has no sync, so PUT every file; index.html goes last so
+        # it never references assets that haven't landed yet.
         run: |
-          aws s3 sync dist/web-app/browser "s3://${{ secrets.AWS_S3_BUCKET }}" \
-            --delete \
-            --exclude "index.html" \
-            --cache-control "public, max-age=3600"
-
-      - name: Upload index.html (no-cache)
-        run: |
-          aws s3 cp dist/web-app/browser/index.html "s3://${{ secrets.AWS_S3_BUCKET }}/index.html" \
-            --cache-control "no-cache, no-store, must-revalidate" \
-            --content-type "text/html"
+          set -euo pipefail
+          upload() {
+            curl -sS --fail-with-body -X PUT "${BUNNY_STORAGE_URL}/${1#./}" \
+              -H "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary "@$1" > /dev/null
+          }
+          export -f upload
+          export BUNNY_STORAGE_URL BUNNY_STORAGE_PASSWORD
+          find . -type f ! -path ./index.html -print0 | xargs -0 -P 8 -I {} bash -c 'upload "$1"' _ {}
+          upload ./index.html
+          echo "Uploaded to Bunny Storage"
 
       - name: Purge Bunny CDN cache
         env:
