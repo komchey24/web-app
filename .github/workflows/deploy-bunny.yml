@@ -104,8 +104,16 @@ jobs:
             Description: $d,
             Enabled: true
           } + (if $guid == "" then {} else {Guid: $guid} end)')
-          curl -sS --fail-with-body -X POST "$API/edgerules/addOrUpdate" \
+          RESPONSE=$(curl -sS -w '\n%{http_code}' -X POST "$API/edgerules/addOrUpdate" \
             -H "AccessKey: ${BUNNY_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d "$BODY" > /dev/null
+            -d "$BODY")
+          STATUS=$(echo "$RESPONSE" | tail -n1)
+          if [ "${STATUS:0:1}" != "2" ]; then
+            echo "Bunny edge rule update failed with HTTP $STATUS:"
+            echo "$RESPONSE" | sed '$d'
+            echo "Request body:"
+            echo "$BODY"
+            exit 1
+          fi
           echo "Browser cache rule ${GUID:-created} applied (Override Browser Cache Time = 0 for non-hashed files)"
