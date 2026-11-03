@@ -19,6 +19,7 @@ import { CdkStepper } from '@angular/cdk/stepper';
 import { ClientAddressStepComponent } from './client-address-step.component';
 import { FormGroupService } from 'app/shared/form-dialog/form-group.service';
 import { environment } from 'environments/environment';
+import { ClientsService } from 'app/clients/clients.service';
 
 describe('ClientAddressStepComponent', () => {
   let component: ClientAddressStepComponent;
@@ -71,6 +72,7 @@ describe('ClientAddressStepComponent', () => {
       ],
       providers: [
         { provide: MatDialog, useValue: dialog },
+        { provide: ClientsService, useValue: { searchAddresses: jest.fn(() => of([])) } },
         { provide: CdkStepper, useValue: { next: jest.fn(), previous: jest.fn() } },
         provideNoopAnimations()
       ]

@@ -15,6 +15,8 @@ import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { environment } from 'environments/environment';
+import type { HttpService } from 'app/core/http/http.service';
+import { AddressSuggestion } from './models/address-suggestion.model';
 
 /**
  * Clients service.
@@ -323,6 +325,19 @@ export class ClientsService {
 
   getClientAddressTemplate() {
     return this.http.get(`/client/addresses/template`);
+  }
+
+  /**
+   * Searches distinct existing addresses whose Address Line 1 starts with the given prefix.
+   * Skips the global error handler so a missing endpoint does not raise an alert on every keystroke.
+   * @param {string} prefix Address Line 1 prefix
+   * @param {number} limit Maximum number of suggestions
+   */
+  searchAddresses(prefix: string, limit = 10): Observable<AddressSuggestion[]> {
+    const httpParams = new HttpParams().set('prefix', prefix).set('limit', limit.toString());
+    return (this.http as HttpService)
+      .skipErrorHandler()
+      .get<AddressSuggestion[]>('/client/addresses/search', { params: httpParams });
   }
 
   createClientAddress(clientId: string, addressTypeId: string, addressData: any) {

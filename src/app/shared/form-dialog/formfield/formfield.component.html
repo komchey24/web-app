@@ -11,7 +11,26 @@
     <div class="flex-fill">
       <mat-form-field class="flex-fill">
         <mat-label>{{ formfield.label }}</mat-label>
-        @if (formfield.controlType === 'input') {
+        @if (formfield.controlType === 'input' && formfield.autocomplete) {
+          <input
+            [type]="formfield.type"
+            matInput
+            [formControlName]="formfield.controlName"
+            [required]="formfield.required"
+            [matAutocomplete]="autocompletePanel"
+          />
+          <mat-autocomplete #autocompletePanel="matAutocomplete">
+            @for (option of autocompleteOptions$ | async; track $index) {
+              <mat-option
+                [value]="formfield.autocomplete.optionValue(option)"
+                (onSelectionChange)="$event.isUserInput && onAutocompleteSelected(option)"
+              >
+                {{ formfield.autocomplete.displayWith(option) }}
+              </mat-option>
+            }
+          </mat-autocomplete>
+        }
+        @if (formfield.controlType === 'input' && !formfield.autocomplete) {
           <input
             [type]="formfield.type"
             matInput

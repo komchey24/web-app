@@ -7,6 +7,7 @@
  */
 
 import { ValidatorFn } from '@angular/forms';
+import { FormfieldAutocomplete } from './formfield-autocomplete';
 
 export class FormfieldBase {
   controlType: string;
@@ -20,6 +21,7 @@ export class FormfieldBase {
   min?: number | null;
   max?: number | null;
   step?: string | number | null;
+  autocomplete?: FormfieldAutocomplete | null;
 
   constructor(
     options: {
@@ -33,6 +35,7 @@ export class FormfieldBase {
       min?: number | null;
       max?: number | null;
       step?: string | number | null;
+      autocomplete?: FormfieldAutocomplete | null;
     } = {}
   ) {
     this.controlType = options.controlType || '';
@@ -45,5 +48,6 @@ export class FormfieldBase {
     this.min = options.min === undefined ? null : options.min;
     this.max = options.max === undefined ? null : options.max;
     this.step = options.step === undefined ? null : options.step;
+    this.autocomplete = options.autocomplete ?? null;
   }
 }

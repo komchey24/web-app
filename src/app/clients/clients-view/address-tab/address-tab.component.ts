@@ -46,6 +46,7 @@ import {
   normalizeAddressCoordinates
 } from 'app/clients/utils/address-coordinate.util';
 import { environment } from 'environments/environment';
+import { buildAddressLine1Autocomplete } from 'app/clients/utils/address-search.util';
 
 /**
  * Clients Address Tab Component
@@ -401,6 +402,10 @@ export class AddressTabComponent {
             label: this.translateService.instant('labels.inputs.Address Line 1'),
             value: address ? address.addressLine1 : '',
             type: 'text',
+            autocomplete: buildAddressLine1Autocomplete(
+              (prefix: string) => this.clientService.searchAddresses(prefix),
+              this.clientAddressTemplate
+            ),
             order: 3
           })
         : null

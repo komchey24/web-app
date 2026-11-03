@@ -33,6 +33,8 @@ import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { hasCoordinateValue, normalizeAddressCoordinates } from 'app/clients/utils/address-coordinate.util';
 import { environment } from 'environments/environment';
+import { ClientsService } from 'app/clients/clients.service';
+import { buildAddressLine1Autocomplete } from 'app/clients/utils/address-search.util';
 
 /**
  * Client Address Step Component
@@ -65,6 +67,7 @@ export class ClientAddressStepComponent {
 
   private dialog = inject(MatDialog);
   private translateService = inject(TranslateService);
+  private clientsService = inject(ClientsService);
 
   /** Client Address Field Config */
   @Input() clientAddressFieldConfig: any;
@@ -247,6 +250,10 @@ export class ClientAddressStepComponent {
             label: this.translateService.instant('labels.inputs.Address Line 1'),
             value: address ? address.addressLine1 : '',
             type: 'text',
+            autocomplete: buildAddressLine1Autocomplete(
+              (prefix: string) => this.clientsService.searchAddresses(prefix),
+              addressTemplate
+            ),
             order: 3
           })
         : null
