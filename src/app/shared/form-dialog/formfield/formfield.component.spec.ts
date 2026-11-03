@@ -89,4 +89,25 @@ describe('FormfieldComponent autocomplete', () => {
 
     expect(input.getAttribute('aria-autocomplete')).toBe('list');
   });
+
+  it('keeps searching after the search function throws synchronously', () => {
+    jest.useFakeTimers();
+    const results: any[][] = [];
+    search.mockImplementation((term: string) => {
+      if (term === 'ab') {
+        throw new TypeError('boom');
+      }
+      return of([{ name: `${term}-result` }]);
+    });
+    const sub = component.autocompleteOptions$.subscribe((options) => results.push(options));
+
+    component.form.get('village')?.setValue('ab');
+    jest.advanceTimersByTime(300);
+    component.form.get('village')?.setValue('abc');
+    jest.advanceTimersByTime(300);
+
+    expect(results).toContainEqual([]);
+    expect(results).toContainEqual([{ name: 'abc-result' }]);
+    sub.unsubscribe();
+  });
 });

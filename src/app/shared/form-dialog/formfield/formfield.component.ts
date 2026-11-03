@@ -9,7 +9,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { Observable, of } from 'rxjs';
+import { Observable, defer, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 
 import { FormfieldBase } from './model/formfield-base';
@@ -47,7 +47,7 @@ export class FormfieldComponent implements OnInit {
       map((value: unknown) => (typeof value === 'string' ? value.trim() : '')),
       distinctUntilChanged(),
       switchMap((term: string) =>
-        term.length >= minLength ? autocomplete.search(term).pipe(catchError(() => of([]))) : of([])
+        term.length >= minLength ? defer(() => autocomplete.search(term)).pipe(catchError(() => of([]))) : of([])
       ),
       map((options) => options ?? [])
     );

@@ -8,14 +8,14 @@
 
 /** Angular Imports */
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams, HttpBackend, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpBackend, HttpHeaders, HttpContext } from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { environment } from 'environments/environment';
-import type { HttpService } from 'app/core/http/http.service';
+import { SKIP_GLOBAL_ERROR_HANDLER } from 'app/core/http/error-handler.interceptor';
 import { AddressSuggestion } from './models/address-suggestion.model';
 
 /**
@@ -335,9 +335,10 @@ export class ClientsService {
    */
   searchAddresses(prefix: string, limit = 10): Observable<AddressSuggestion[]> {
     const httpParams = new HttpParams().set('prefix', prefix).set('limit', limit.toString());
-    return (this.http as HttpService)
-      .skipErrorHandler()
-      .get<AddressSuggestion[]>('/client/addresses/search', { params: httpParams });
+    return this.http.get<AddressSuggestion[]>('/client/addresses/search', {
+      params: httpParams,
+      context: new HttpContext().set(SKIP_GLOBAL_ERROR_HANDLER, true)
+    });
   }
 
   createClientAddress(clientId: string, addressTypeId: string, addressData: any) {

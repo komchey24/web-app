@@ -13,6 +13,7 @@ import { firstValueFrom } from 'rxjs';
 import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
 
 import { ClientsService } from './clients.service';
+import { SKIP_GLOBAL_ERROR_HANDLER } from 'app/core/http/error-handler.interceptor';
 
 describe('ClientsService', () => {
   let service: ClientsService;
@@ -258,6 +259,21 @@ describe('ClientsService', () => {
       expect(result.length).toBe(2);
       expect(result[0].firstName).toBe('Alice');
       expect(result[1].relationship.name).toBe('Child');
+    });
+  });
+
+  describe('Client Address Search', () => {
+    it('should search addresses with the plain HttpClient and skip the global error alert', async () => {
+      const mockSuggestions = [{ addressLine1: 'Village A', addressLine2: 'Commune B' }];
+      const resultPromise = firstValueFrom(service.searchAddresses('Vil'));
+
+      const req = httpMock.expectOne((r) => r.url === '/client/addresses/search' && r.method === 'GET');
+      expect(req.request.params.get('prefix')).toBe('Vil');
+      expect(req.request.params.get('limit')).toBe('10');
+      expect(req.request.context.get(SKIP_GLOBAL_ERROR_HANDLER)).toBe(true);
+
+      req.flush(mockSuggestions);
+      expect(await resultPromise).toEqual(mockSuggestions);
     });
   });
 });
