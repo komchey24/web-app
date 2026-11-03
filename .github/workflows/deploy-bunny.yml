@@ -72,3 +72,40 @@ jobs:
             exit 1
           fi
           echo "Bunny CDN cache purged"
+
+      # Bundles (main-*.js, chunk-*.js, styles-*.css, media/*) are content-hashed and
+      # keep the pull zone's long browser cache. Files with fixed names must be
+      # revalidated by browsers on every load, otherwise they keep a stale index.html
+      # (pointing at old bundles) or stale translations/env.js for months.
+      - name: Configure Bunny browser cache rules
+        env:
+          BUNNY_PULL_ZONE_ID: ${{ secrets.BUNNY_PULL_ZONE_ID }}
+          BUNNY_API_KEY: ${{ secrets.BUNNY_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$BUNNY_PULL_ZONE_ID" ]; then
+            echo "BUNNY_PULL_ZONE_ID not set — skipping cache rules"
+            exit 0
+          fi
+          API="https://api.bunny.net/pullzone/${BUNNY_PULL_ZONE_ID}"
+          DESCRIPTION="web-app: revalidate non-hashed files (managed by deploy-bunny.yml)"
+          # Reuse the existing rule's Guid so re-running updates it instead of adding duplicates
+          GUID=$(curl -sS --fail-with-body "$API" -H "AccessKey: ${BUNNY_API_KEY}" \
+            | jq -r --arg d "$DESCRIPTION" '[.EdgeRules[]? | select(.Description == $d) | .Guid][0] // empty')
+          BODY=$(jq -n --arg guid "$GUID" --arg d "$DESCRIPTION" '{
+            ActionType: 16,
+            ActionParameter1: "0",
+            Triggers: [{
+              Type: 0,
+              PatternMatchingType: 0,
+              PatternMatches: ["*/", "*/index.html", "*/manifest.json", "*/mifosx-theme.css", "*/robots.txt", "*/favicon.ico", "*/assets/*"]
+            }],
+            TriggerMatchingType: 0,
+            Description: $d,
+            Enabled: true
+          } + (if $guid == "" then {} else {Guid: $guid} end)')
+          curl -sS --fail-with-body -X POST "$API/edgerules/addOrUpdate" \
+            -H "AccessKey: ${BUNNY_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" > /dev/null
+          echo "Browser cache rule ${GUID:-created} applied (Override Browser Cache Time = 0 for non-hashed files)"
