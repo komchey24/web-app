@@ -95,11 +95,11 @@ jobs:
           BODY=$(jq -n --arg guid "$GUID" --arg d "$DESCRIPTION" '{
             ActionType: 16,
             ActionParameter1: "0",
-            Triggers: [{
-              Type: 0,
-              PatternMatchingType: 0,
-              PatternMatches: ["*/", "*/index.html", "*/manifest.json", "*/mifosx-theme.css", "*/robots.txt", "*/favicon.ico", "*/assets/*"]
-            }],
+            # Bunny allows at most 5 patterns per trigger; any trigger matching applies the rule
+            Triggers: [
+              {Type: 0, PatternMatchingType: 0, PatternMatches: ["*/", "*/index.html", "*/manifest.json", "*/mifosx-theme.css"]},
+              {Type: 0, PatternMatchingType: 0, PatternMatches: ["*/robots.txt", "*/favicon.ico", "*/assets/*"]}
+            ],
             TriggerMatchingType: 0,
             Description: $d,
             Enabled: true
